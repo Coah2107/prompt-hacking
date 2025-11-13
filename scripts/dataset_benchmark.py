@@ -1,30 +1,22 @@
+#!/usr/bin/env python3
 """
-Dataset Performance Benchmark
-So sánh performance của models trên different datasets
+Dataset Performance Benchmark - So sánh performance của models trên các datasets khác nhau
+Author: System Integration Team
+Date: November 2024
+
+Chạy: python -m scripts.dataset_benchmark
 """
 
 import pandas as pd
 import numpy as np
-from pathlib import Path
 import json
 from datetime import datetime
-import sys
-import os
+from pathlib import Path
 
-# Add detection system to path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-detection_dir = os.path.join(current_dir, '..', 'detection_system')
-sys.path.insert(0, detection_dir)
-
-# Import ML detector
-ml_dir = os.path.join(detection_dir, 'models', 'ml_based')
-sys.path.insert(0, ml_dir)
-from traditional_ml import TraditionalMLDetector
-
-# Import feature extractor
-features_dir = os.path.join(detection_dir, 'features', 'text_features')
-sys.path.insert(0, features_dir)
-from text_features import TextFeaturesExtractor
+# Absolute imports
+from utils.path_utils import get_project_root, get_datasets_dir, get_results_dir
+from detection_system.models.ml_based.traditional_ml import TraditionalMLDetector
+from detection_system.features.text_features.text_features import TextFeaturesExtractor
 
 class DatasetBenchmark:
     def __init__(self):
@@ -49,6 +41,22 @@ class DatasetBenchmark:
         print(f"\n📊 Loading {dataset_name}...")
         
         df = pd.read_csv(dataset_path)
+        
+        # Clean data - remove rows with missing prompts
+        original_size = len(df)
+        df = df.dropna(subset=['prompt'])
+        
+        # Remove non-string prompts
+        df = df[df['prompt'].apply(lambda x: isinstance(x, str))]
+        
+        cleaned_size = len(df)
+        if cleaned_size != original_size:
+            print(f"   ⚠️  Cleaned: {original_size} → {cleaned_size} samples (removed {original_size - cleaned_size} invalid)")
+        
+        # Sample large datasets for efficiency
+        if len(df) > 10000:
+            print(f"   ⚡ Sampling {len(df)} → 10000 for efficient processing...")
+            df = df.sample(n=10000, random_state=42)
         
         # Convert labels to binary if needed
         if df['label'].dtype == 'object':
@@ -204,24 +212,33 @@ class DatasetBenchmark:
     def run_comprehensive_benchmark(self):
         """Run benchmark on multiple datasets"""
         print("🚀 COMPREHENSIVE DATASET BENCHMARK")
-        print("=" * 60)
+        print("=" * 70)
         
         datasets_to_test = []
-        
-        # Check for existing datasets
-        datasets_dir = Path('../datasets')
-        
-        # Original simple dataset
-        simple_path = datasets_dir / 'full_dataset.csv'
-        if simple_path.exists():
-            datasets_to_test.append(('Simple Dataset', str(simple_path)))
+        datasets_dir = get_datasets_dir()
         
         # Look for challenging datasets
         challenging_files = list(datasets_dir.glob('challenging_dataset_*.csv'))
         if challenging_files:
             # Use the most recent challenging dataset
-            latest_challenging = max(challenging_files, key=os.path.getctime)
+            latest_challenging = max(challenging_files, key=lambda x: x.stat().st_mtime)
             datasets_to_test.append(('Challenging Dataset', str(latest_challenging)))
+        
+        # Look for HuggingFace datasets
+        huggingface_files = list(datasets_dir.glob('huggingface_dataset_*.csv'))
+        if huggingface_files:
+            # Use the most recent HuggingFace dataset
+            latest_huggingface = max(huggingface_files, key=lambda x: x.stat().st_mtime)
+            datasets_to_test.append(('HuggingFace Dataset', str(latest_huggingface)))
+        
+        if not datasets_to_test:
+            print("❌ No datasets found in datasets/ directory")
+            print("💡 Please ensure you have challenging_dataset_*.csv or huggingface_dataset_*.csv files")
+            return {}
+        
+        print(f"📊 Found {len(datasets_to_test)} datasets to benchmark:")
+        for name, path in datasets_to_test:
+            print(f"   • {name}: {Path(path).name}")
         
         # Run evaluation on each dataset
         for dataset_name, dataset_path in datasets_to_test:
@@ -233,7 +250,10 @@ class DatasetBenchmark:
                 continue
         
         # Generate comparison report
-        self.generate_comparison_report()
+        if self.results:
+            self.generate_comparison_report()
+        else:
+            print("❌ No successful evaluations completed")
         
         return self.results
     
@@ -303,8 +323,10 @@ class DatasetBenchmark:
             print(f"     Malicious ratio: {stats['malicious_ratio']:.2%}")
         
         # Save detailed report
-        report_path = '../results/benchmark_report.json'
-        Path('../results').mkdir(exist_ok=True)
+        results_dir = get_results_dir()
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_filename = f"dataset_benchmark_{timestamp}.json"
+        report_path = results_dir / report_filename
         
         report_data = {
             'benchmark_date': datetime.now().isoformat(),
@@ -317,10 +339,19 @@ class DatasetBenchmark:
             }
         }
         
-        with open(report_path, 'w') as f:
-            json.dump(report_data, f, indent=2, default=str)
-        
-        print(f"\n💾 Detailed benchmark report saved: {report_path}")
+        try:
+            with open(report_path, 'w', encoding='utf-8') as f:
+                json.dump(report_data, f, indent=2, default=str, ensure_ascii=False)
+            
+            print(f"\n💾 Detailed benchmark report saved: {report_path}")
+            
+            # Also save to standard benchmark_report.json for compatibility
+            standard_path = results_dir / "benchmark_report.json"
+            with open(standard_path, 'w', encoding='utf-8') as f:
+                json.dump(report_data, f, indent=2, default=str, ensure_ascii=False)
+            
+        except Exception as e:
+            print(f"\n❌ Failed to save benchmark report: {e}")
     
     def _find_best_model(self):
         """Find best performing model across datasets"""

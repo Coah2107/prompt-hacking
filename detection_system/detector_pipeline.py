@@ -1,6 +1,7 @@
 """
-Main Detection Pipeline
-Lý do: Integrate tất cả components thành một system hoàn chỉnh
+Main Detection Pipeline - Integrate tất cả components thành một system hoàn chỉnh
+Author: System Integration Team
+Date: November 2024
 """
 
 import pandas as pd
@@ -9,28 +10,12 @@ from pathlib import Path
 import json
 import time
 from datetime import datetime
-import sys
-import os
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, current_dir)
-
-from config import Config
-
-# Add paths for features and models
-features_dir = os.path.join(current_dir, 'features', 'text_features')
-sys.path.insert(0, features_dir)
-from text_features import TextFeaturesExtractor
-
-# Add paths for rule-based detector
-rule_based_dir = os.path.join(current_dir, 'models', 'rule_based')
-sys.path.insert(0, rule_based_dir)
-from pattern_detector import RuleBasedDetector
-
-# Add paths for ML-based detector
-ml_based_dir = os.path.join(current_dir, 'models', 'ml_based')
-sys.path.insert(0, ml_based_dir)
-from traditional_ml import TraditionalMLDetector
+# Absolute imports
+from detection_system.config import Config
+from detection_system.features.text_features.text_features import TextFeaturesExtractor
+from detection_system.models.rule_based.pattern_detector import RuleBasedDetector
+from detection_system.models.ml_based.traditional_ml import TraditionalMLDetector
 
 class DetectionPipeline:
     def __init__(self, config=None):

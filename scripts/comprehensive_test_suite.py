@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
 """
-Comprehensive Model Testing Suite
-Test models trên multiple datasets để đánh giá performance thực tế
+Comprehensive Model Testing Suite - Test models trên multiple datasets
+Author: System Integration Team
+Date: November 2024
+
+Chạy: python -m scripts.comprehensive_test_suite
 """
 
 import pandas as pd
@@ -8,23 +12,13 @@ import numpy as np
 import json
 from pathlib import Path
 from datetime import datetime
-import sys
-import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Add detection system to path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-detection_dir = os.path.join(current_dir, '..', 'detection_system')
-sys.path.insert(0, detection_dir)
-
-ml_dir = os.path.join(detection_dir, 'models', 'ml_based')
-sys.path.insert(0, ml_dir)
-from traditional_ml import TraditionalMLDetector
-
-features_dir = os.path.join(detection_dir, 'features', 'text_features')
-sys.path.insert(0, features_dir)
-from text_features import TextFeaturesExtractor
+# Absolute imports
+from utils.path_utils import get_project_root, get_datasets_dir, get_results_dir
+from detection_system.models.ml_based.traditional_ml import TraditionalMLDetector
+from detection_system.features.text_features.text_features import TextFeaturesExtractor
 
 class ComprehensiveModelTester:
     def __init__(self):

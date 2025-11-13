@@ -1,0 +1,3 @@
+"""
+Detection System Evaluation package
+"""

@@ -16,11 +16,28 @@ import json
 from pathlib import Path
 
 class TraditionalMLDetector:
-    def __init__(self, config):
+    def __init__(self, config=None):
+        # Default config if none provided
+        if config is None:
+            config = self._get_default_config()
+        
         self.config = config
         self.models = self._initialize_models()
         self.trained_models = {}
         self.feature_extractor = None
+        
+    def _get_default_config(self):
+        """Provide default configuration if none given"""
+        class DefaultConfig:
+            RANDOM_STATE = 42
+            CV_FOLDS = 5
+            PRIMARY_METRIC = 'f1_score'
+            MAX_FEATURES = 5000
+            MIN_DF = 2
+            MAX_DF = 0.95
+            NGRAM_RANGE = (1, 2)
+        
+        return DefaultConfig()
         
     def _initialize_models(self):
         """
@@ -243,22 +260,86 @@ class TraditionalMLDetector:
         Load pre-trained model
         """
         return joblib.load(model_path)
+    
+    def detect_single_prompt(self, prompt, model_name='logistic_regression'):
+        """
+        Detect if a single prompt is malicious using specified model
+        """
+        # Use path utils for consistent path management
+        import os
+        try:
+            from utils.path_utils import get_models_dir
+            models_dir = get_models_dir()
+            model_path = models_dir / f'{model_name}.joblib'
+        except ImportError:
+            # Fallback to relative path
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            models_dir = os.path.join(current_dir, '..', '..', 'saved_models')
+            model_path = os.path.join(models_dir, f'{model_name}.joblib')
+        
+        if not os.path.exists(model_path):
+            return {
+                'prompt': prompt,
+                'prediction': 'unknown',
+                'confidence': 0.0,
+                'error': f'Model {model_name} not found at {model_path}'
+            }
+        
+        try:
+            # Load model
+            model = joblib.load(model_path)
+            
+            # Extract features (simplified for testing)
+            from detection_system.features.text_features.text_features import TextFeaturesExtractor
+            extractor = TextFeaturesExtractor(self.config)
+            features = extractor.extract_all_features([prompt])
+            
+            # Prepare features
+            X = self.prepare_features(
+                features['statistical_features'], 
+                features['tfidf_features']
+            )
+            
+            # Predict
+            prediction = model.predict(X)[0]
+            confidence = model.predict_proba(X)[0].max() if hasattr(model, 'predict_proba') else prediction
+            
+            return {
+                'prompt': prompt,
+                'prediction': 'malicious' if prediction == 1 else 'benign',
+                'confidence': float(confidence),
+                'model_used': model_name
+            }
+            
+        except Exception as e:
+            return {
+                'prompt': prompt,
+                'prediction': 'error',
+                'confidence': 0.0,
+                'error': str(e)
+            }
 
 # Test function
 if __name__ == "__main__":
     import sys
     import os
     
-    # Add path to detection_system directory
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    detection_system_dir = os.path.join(current_dir, '../..')
-    sys.path.insert(0, detection_system_dir)
-    
-    from config import Config
-    
-    # Add path for text_features module
-    features_dir = os.path.join(detection_system_dir, 'features', 'text_features')
-    sys.path.insert(0, features_dir)
+    try:
+        # Use absolute imports if available
+        from detection_system.config import Config
+        from detection_system.features.text_features.text_features import TextFeaturesExtractor
+        from utils.path_utils import get_datasets_dir
+    except ImportError:
+        # Fallback to old method for backward compatibility
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        detection_system_dir = os.path.join(current_dir, '../..')
+        sys.path.insert(0, detection_system_dir)
+        
+        from config import Config
+        
+        # Add path for text_features module
+        features_dir = os.path.join(detection_system_dir, 'features', 'text_features')
+        sys.path.insert(0, features_dir)
     
     from text_features import TextFeaturesExtractor
     
@@ -275,12 +356,25 @@ if __name__ == "__main__":
     # Load real dataset for testing
     print("Loading real dataset...")
     
-    # Path to dataset
-    dataset_path = os.path.join(detection_system_dir, '..', 'datasets', 'full_dataset.csv')
+    # Path to dataset - try current datasets first
+    try:
+        datasets_dir = get_datasets_dir()
+        
+        # Look for challenging dataset first
+        challenging_files = list(datasets_dir.glob('challenging_dataset_*.csv'))
+        if challenging_files:
+            dataset_path = max(challenging_files, key=lambda x: x.stat().st_mtime)
+            print(f"📊 Using challenging dataset: {dataset_path.name}")
+        else:
+            # Fallback to old path
+            dataset_path = datasets_dir / 'full_dataset.csv'
+    except (ImportError, NameError):
+        # Fallback for backward compatibility
+        dataset_path = os.path.join(detection_system_dir, '..', 'datasets', 'full_dataset.csv')
     
     if not os.path.exists(dataset_path):
         print(f"❌ Dataset not found at {dataset_path}")
-        print("Please run dataset_builder.py first to generate the dataset")
+        print("Please ensure you have datasets available in datasets/ directory")
         exit(1)
     
     # Load dataset
@@ -484,7 +578,7 @@ if __name__ == "__main__":
             print(f"\n📝 TEXT PATTERN ANALYSIS:")
             # Load dataset again for analysis
             import pandas as pd
-            df = pd.read_csv('/Users/haolychi/Desktop/wordspace/job/prompt-hacking/datasets/full_dataset.csv')
+            df = pd.read_csv(dataset_path)
             malicious_samples = df[df['label'] == 'malicious']
             benign_samples = df[df['label'] == 'benign']
             

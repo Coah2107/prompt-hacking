@@ -1,28 +1,22 @@
+#!/usr/bin/env python3
 """
-HuggingFace Dataset Performance Test
-Test model performance trên large-scale dataset từ HuggingFace
+HuggingFace Dataset Performance Test - Test model performance trên large-scale dataset
+Author: System Integration Team  
+Date: November 2024
+
+Chạy: python -m scripts.huggingface_test
 """
 
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import sys
-import os
 from datetime import datetime
 import json
 
-# Add detection system to path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-detection_dir = os.path.join(current_dir, '..', 'detection_system')
-sys.path.insert(0, detection_dir)
-
-ml_dir = os.path.join(detection_dir, 'models', 'ml_based')
-sys.path.insert(0, ml_dir)
-from traditional_ml import TraditionalMLDetector
-
-features_dir = os.path.join(detection_dir, 'features', 'text_features')
-sys.path.insert(0, features_dir)
-from text_features import TextFeaturesExtractor
+# Absolute imports
+from utils.path_utils import get_project_root, get_datasets_dir, get_results_dir
+from detection_system.models.ml_based.traditional_ml import TraditionalMLDetector
+from detection_system.features.text_features.text_features import TextFeaturesExtractor
 
 class HuggingFaceModelTester:
     def __init__(self):
