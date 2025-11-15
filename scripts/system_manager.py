@@ -97,22 +97,22 @@ class SystemManager:
         
         for i, (cmd, info) in enumerate(self.available_commands.items(), 1):
             print(f"{i}. {cmd.upper()}")
-            print(f"   📋 {info['description']}")
-            print(f"   ⏰ Estimated time: {info['estimated_time']}")
+            print(f"   Description: {info['description']}")
+            print(f"   Estimated time: {info['estimated_time']}")
             print()
     
     def run_command(self, command):
         """Execute a system command"""
         if command not in self.available_commands:
-            print(f"❌ Unknown command: {command}")
+            print(f"Unknown command: {command}")
             return False
         
         info = self.available_commands[command]
         script_module = info['script']
         
-        print(f"\n🚀 EXECUTING: {command.upper()}")
-        print(f"📋 Description: {info['description']}")
-        print(f"⏰ Estimated time: {info['estimated_time']}")
+        print(f"\nEXECUTING: {command.upper()}")
+        print(f"Description: {info['description']}")
+        print(f"Estimated time: {info['estimated_time']}")
         print("-" * 50)
         
         try:
@@ -122,30 +122,30 @@ class SystemManager:
             ], cwd=self.project_root, capture_output=False)
             
             if result.returncode == 0:
-                print(f"\n✅ {command.upper()} completed successfully!")
+                print(f"\n{command.upper()} completed successfully!")
                 return True
             else:
-                print(f"\n❌ {command.upper()} failed with exit code {result.returncode}")
+                print(f"\n{command.upper()} failed with exit code {result.returncode}")
                 return False
                 
         except Exception as e:
-            print(f"\n❌ Error executing {command}: {e}")
+            print(f"\nError executing {command}: {e}")
             return False
     
     def quick_health_check(self):
         """Run a quick system health check"""
-        print("\n🏥 QUICK HEALTH CHECK")
+        print("\nQUICK HEALTH CHECK")
         print("-" * 50)
         
         try:
             # Test imports
-            print("📦 Testing imports...")
+            print("Testing imports...")
             from detection_system.models.rule_based.pattern_detector import RuleBasedDetector
             from prevention_system.filters.input_filters.core_filter import InputFilter
-            print("   ✅ Core imports successful")
+            print("   Core imports successful")
             
             # Test basic functionality
-            print("🧪 Testing basic functionality...")
+            print("Testing basic functionality...")
             detector = RuleBasedDetector()
             filter_system = InputFilter()
             
@@ -154,36 +154,36 @@ class SystemManager:
             detection_result = detector.detect_single_prompt(sample_input)
             filter_result = filter_system.filter_prompt(sample_input)
             
-            print("   ✅ Basic functionality working")
-            print(f"   📊 Sample detection: {detection_result['prediction']}")
-            print(f"   🛡️  Sample filter: {'allowed' if filter_result['allowed'] else 'blocked'}")
+            print("   Basic functionality working")
+            print(f"   Sample detection: {detection_result['prediction']}")
+            print(f"   Sample filter: {'allowed' if filter_result['allowed'] else 'blocked'}")
             
-            print("\n✅ HEALTH CHECK PASSED")
+            print("\nHEALTH CHECK PASSED")
             return True
             
         except Exception as e:
-            print(f"\n❌ HEALTH CHECK FAILED: {e}")
+            print(f"\nHEALTH CHECK FAILED: {e}")
             return False
     
     def interactive_menu(self):
         """Interactive command menu"""
         while True:
             print("\n" + "="*60)
-            print("🎮 INTERACTIVE SYSTEM MANAGER")
+            print("INTERACTIVE SYSTEM MANAGER")
             print("="*60)
             
             self.display_available_commands()
             
-            print("📝 Additional Options:")
+            print("Additional Options:")
             print("   status  - Show system status")
             print("   health  - Quick health check") 
             print("   exit    - Exit system manager")
             
             try:
-                choice = input("\n🎯 Enter command: ").strip().lower()
+                choice = input("\nEnter command: ").strip().lower()
                 
                 if choice == 'exit':
-                    print("👋 Goodbye!")
+                    print("Goodbye!")
                     break
                 elif choice == 'status':
                     self.display_system_status()
@@ -198,51 +198,51 @@ class SystemManager:
                     if 0 <= idx < len(commands):
                         self.run_command(commands[idx])
                     else:
-                        print("❌ Invalid selection")
+                        print("Invalid selection")
                 else:
-                    print(f"❌ Unknown command: {choice}")
-                    print("💡 Try: test, workflow, benchmark, integration, dataset, status, health, or exit")
+                    print(f"Unknown command: {choice}")
+                    print("Try: test, workflow, benchmark, integration, dataset, status, health, or exit")
                 
                 # Pause after command execution
                 if choice not in ['exit', 'status', 'health']:
                     input("\nPress Enter to continue...")
                     
             except KeyboardInterrupt:
-                print("\n👋 Exiting...")
+                print("\nExiting...")
                 break
             except Exception as e:
-                print(f"\n❌ Error: {e}")
+                print(f"\nError: {e}")
     
     def batch_execution(self, commands):
         """Execute multiple commands in sequence"""
-        print(f"\n🔄 BATCH EXECUTION MODE")
-        print(f"📋 Commands to execute: {', '.join(commands)}")
+        print(f"\nBATCH EXECUTION MODE")
+        print(f"Commands to execute: {', '.join(commands)}")
         print("-" * 50)
         
         results = {}
         
         for i, command in enumerate(commands, 1):
-            print(f"\n📊 Executing {i}/{len(commands)}: {command}")
+            print(f"\nExecuting {i}/{len(commands)}: {command}")
             
             success = self.run_command(command)
             results[command] = success
             
             if not success:
-                print(f"\n⚠️  Command {command} failed. Continue? (y/n)")
+                print(f"\nCommand {command} failed. Continue? (y/n)")
                 if input().strip().lower() != 'y':
                     break
         
         # Summary
-        print(f"\n📈 BATCH EXECUTION SUMMARY")
+        print(f"\nBATCH EXECUTION SUMMARY")
         print("-" * 50)
         successful = sum(results.values())
         total = len(results)
         
         for cmd, success in results.items():
-            status = "✅" if success else "❌"
+            status = "PASS" if success else "FAIL"
             print(f"{status} {cmd}")
         
-        print(f"\n📊 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+        print(f"\nSuccess Rate: {successful}/{total} ({successful/total*100:.1f}%)")
         
         return results
 
@@ -285,9 +285,9 @@ def main():
             manager.interactive_menu()
             
     except KeyboardInterrupt:
-        print("\n👋 System manager interrupted by user")
+        print("\nSystem manager interrupted by user")
     except Exception as e:
-        print(f"\n❌ System manager error: {e}")
+        print(f"\nSystem manager error: {e}")
 
 if __name__ == "__main__":
     main()

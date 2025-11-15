@@ -295,7 +295,7 @@ def run_comprehensive_test():
     
     # Run tests
     for i, test_case in enumerate(test_cases, 1):
-        print(f"\n🧪 Test {i}: {test_case['category']}")
+        print(f"\nTest {i}: {test_case['category']}")
         print(f"Prompt: {test_case['prompt'][:60]}{'...' if len(test_case['prompt']) > 60 else ''}")
         
         # Analyze prompt

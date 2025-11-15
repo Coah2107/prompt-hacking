@@ -325,7 +325,7 @@ if __name__ == "__main__":
         "This is a very long prompt that exceeds the maximum length limit by containing way too many characters and words that should trigger the length-based filtering mechanism of our system" * 10
     ]
     
-    print("🧪 Testing Core Input Filter")
+    print("Testing Core Input Filter")
     print("=" * 50)
     
     for i, prompt in enumerate(test_prompts, 1):

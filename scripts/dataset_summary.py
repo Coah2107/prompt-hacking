@@ -19,7 +19,7 @@ from utils.path_utils import get_project_root, get_datasets_dir, get_results_dir
 def analyze_current_datasets():
     """Phân tích các datasets hiện có trong hệ thống"""
     
-    print("📊 CURRENT DATASET ANALYSIS")
+    print("ANALYSIS CURRENT DATASET ANALYSIS")
     print("=" * 70)
     
     datasets_dir = get_datasets_dir()
@@ -29,7 +29,7 @@ def analyze_current_datasets():
     challenging_files = list(datasets_dir.glob('challenging_dataset_*.csv'))
     if challenging_files:
         latest_challenging = max(challenging_files, key=lambda x: x.stat().st_mtime)
-        print(f"\n🎯 CHALLENGING DATASET: {latest_challenging.name}")
+        print(f"\nTARGET CHALLENGING DATASET: {latest_challenging.name}")
         
         df = pd.read_csv(latest_challenging)
         
@@ -68,10 +68,10 @@ def analyze_current_datasets():
             'columns': list(df.columns)
         }
         
-        print(f"   📊 Total Samples: {total_samples}")
+        print(f"   ANALYSIS Total Samples: {total_samples}")
         print(f"   🔴 Malicious: {malicious_count} ({malicious_ratio:.1%})")
         print(f"   🟢 Benign: {total_samples - malicious_count} ({1-malicious_ratio:.1%})")
-        print(f"   📝 Avg Prompt Length: {prompt_lengths.mean():.0f} chars")
+        print(f"   Avg Avg Prompt Length: {prompt_lengths.mean():.0f} chars")
         
         if difficulty_analysis:
             print(f"   🎚️  Difficulty Distribution:")
@@ -82,7 +82,7 @@ def analyze_current_datasets():
     huggingface_files = list(datasets_dir.glob('huggingface_dataset_*.csv'))
     if huggingface_files:
         latest_huggingface = max(huggingface_files, key=lambda x: x.stat().st_mtime)
-        print(f"\n🚀 HUGGINGFACE DATASET: {latest_huggingface.name}")
+        print(f"\nHUGGINGFACE HUGGINGFACE DATASET: {latest_huggingface.name}")
         
         # Đọc metadata nếu có
         metadata_files = list(datasets_dir.glob('huggingface_metadata_*.json'))
@@ -120,10 +120,10 @@ def analyze_current_datasets():
             'metadata': metadata
         }
         
-        print(f"   📊 Total Samples: {total_samples}")
+        print(f"   ANALYSIS Total Samples: {total_samples}")
         print(f"   🔴 Malicious: {malicious_count} ({malicious_ratio:.1%})")
         print(f"   🟢 Benign: {total_samples - malicious_count} ({1-malicious_ratio:.1%})")
-        print(f"   📝 Avg Prompt Length: {prompt_lengths.mean():.0f} chars")
+        print(f"   Avg Avg Prompt Length: {prompt_lengths.mean():.0f} chars")
         
         if metadata:
             original_size = metadata.get('original_dataset_size', 'Unknown')
@@ -135,7 +135,7 @@ def analyze_current_datasets():
 def summarize_results():
     """Tổng hợp kết quả từ các datasets hiện tại"""
     
-    print("🎯 DATASET PERFORMANCE SUMMARY")
+    print("TARGET DATASET PERFORMANCE SUMMARY")
     print("=" * 70)
     
     # Phân tích datasets hiện tại
@@ -180,7 +180,7 @@ def summarize_results():
     }
     
     # Print performance comparison table
-    print("\n🎯 PERFORMANCE COMPARISON (Estimated F1 Scores):")
+    print("\nTARGET PERFORMANCE COMPARISON (Estimated F1 Scores):")
     print("-" * 75)
     
     models = ["Rule-based Detection", "Logistic Regression", "Random Forest", "SVM", "Gradient Boosting"]
@@ -201,23 +201,23 @@ def summarize_results():
         print(f"{model:<20} {challenge_score:.3f}        {hf_score:.3f}        {gap_str:<15}")
     
     # Dataset characteristics từ dữ liệu thực tế
-    print(f"\n📋 CURRENT DATASET CHARACTERISTICS:")
+    print(f"\nCURRENT CURRENT DATASET CHARACTERISTICS:")
     print("-" * 75)
     
     for dataset_type, data in current_datasets.items():
         if dataset_type == 'challenging':
-            title = "🎯 Challenging Dataset"
+            title = "TARGET Challenging Dataset"
         elif dataset_type == 'huggingface':
-            title = "🚀 HuggingFace Dataset"
+            title = "HUGGINGFACE HuggingFace Dataset"
         else:
-            title = f"📊 {dataset_type.title()} Dataset"
+            title = f"ANALYSIS {dataset_type.title()} Dataset"
             
         print(f"\n{title}:")
-        print(f"  📁 File: {data['file']}")
-        print(f"  📊 Samples: {data['total_samples']:,}")
+        print(f"  File File: {data['file']}")
+        print(f"  ANALYSIS Samples: {data['total_samples']:,}")
         print(f"  🔴 Malicious: {data['malicious_count']:,} ({data['malicious_ratio']:.1%})")
         print(f"  🟢 Benign: {data['benign_count']:,} ({1-data['malicious_ratio']:.1%})")
-        print(f"  📝 Avg Prompt Length: {data['prompt_stats']['avg_length']:.0f} chars")
+        print(f"  Avg Avg Prompt Length: {data['prompt_stats']['avg_length']:.0f} chars")
         print(f"  📏 Length Range: {data['prompt_stats']['min_length']:.0f} - {data['prompt_stats']['max_length']:.0f} chars")
         
         if 'difficulty_distribution' in data and data['difficulty_distribution']:
@@ -226,13 +226,13 @@ def summarize_results():
                 print(f"     • {diff}: {count} samples")
     
     # Performance insights
-    print(f"\n📈 PERFORMANCE INSIGHTS:")
+    print(f"\nPERFORMANCE PERFORMANCE INSIGHTS:")
     print("-" * 75)
     
     for dataset_name, data in performance_estimates.items():
         print(f"\n{dataset_name}:")
-        print(f"  📝 {data['description']}")
-        print(f"  💡 Key Insights:")
+        print(f"  Avg {data['description']}")
+        print(f"  Key Key Insights:")
         for insight in data['key_insights']:
             print(f"     • {insight}")
     
@@ -273,7 +273,7 @@ def summarize_results():
     print("  4. Performance gap shows real-world complexity")
     print("  5. Hybrid approach (rules + ML) recommended for production")
     
-    print(f"\n🎯 RECOMMENDATIONS:")
+    print(f"\nTARGET RECOMMENDATIONS:")
     print("  ✅ Use Rule-based detection as primary defense (high accuracy)")
     print("  ✅ Use Challenging dataset for ML model development")
     print("  ✅ Use HuggingFace dataset for final validation & benchmarking")
@@ -282,15 +282,15 @@ def summarize_results():
     print("  ✅ Consider ensemble methods for edge cases")
     
     # Current dataset files summary
-    print(f"\n📁 CURRENT DATASET FILES:")
+    print(f"\nFile CURRENT DATASET FILES:")
     datasets_dir = get_datasets_dir()
     
-    print(f"\n🎯 Challenging Dataset:")
+    print(f"\nTARGET Challenging Dataset:")
     challenging_files = list(datasets_dir.glob('challenging_*.csv'))
     for f in sorted(challenging_files)[-2:]:  # Show last 2
         print(f"  • {f.name}")
     
-    print(f"\n🚀 HuggingFace Dataset:")
+    print(f"\nHUGGINGFACE HuggingFace Dataset:")
     hf_files = list(datasets_dir.glob('huggingface_*.csv'))
     for f in sorted(hf_files)[-2:]:  # Show last 2  
         print(f"  • {f.name}")
@@ -311,14 +311,14 @@ def summarize_results():
                   f"avg {data['prompt_stats']['avg_length']:.0f} chars")
         
         overall_malicious_ratio = total_malicious / total_samples if total_samples > 0 else 0
-        print(f"\n  📈 Combined: {total_samples:,} samples, {overall_malicious_ratio:.1%} malicious")
+        print(f"\n  PERFORMANCE Combined: {total_samples:,} samples, {overall_malicious_ratio:.1%} malicious")
 
     print(f"\n🏆 FINAL COMPARISON - CURRENT SYSTEM:")
     print("-" * 80)
     print(f"{'Approach':<25} {'F1 Score':<10} {'Coverage':<15} {'Recommendation'}")
     print("-" * 80)
     
-    rule_based = "🎯 Primary"
+    rule_based = "TARGET Primary"
     ml_support = "🔧 Support"
     hybrid = "� Best"
     
@@ -326,7 +326,7 @@ def summarize_results():
     print(f"{'ML (Logistic Reg)':<25} {'0.720-0.895':<10} {'Novel Attacks':<15} {ml_support}")
     print(f"{'Hybrid (Rules + ML)':<25} {'0.900+':<10} {'Comprehensive':<15} {hybrid}")
     
-    print(f"\n🎯 CURRENT SYSTEM STATUS:")
+    print(f"\nTARGET CURRENT SYSTEM STATUS:")
     print("  ✅ Rule-based detection: Implemented and operational")
     print("  ✅ ML models: Trained and ready (3 models available)")
     print("  ✅ Datasets: Available for validation and improvement")

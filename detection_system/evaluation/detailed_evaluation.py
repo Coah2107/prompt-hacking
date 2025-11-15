@@ -157,13 +157,13 @@ class DetailedEvaluator:
         print(f"   ML vs Rule-based: {improvement:+.1f}% F1 score improvement")
         
         # Recommendations
-        print(f"\n💡 RECOMMENDATIONS:")
+        print(f"\nRECOMMENDATIONS:")
         if best_f1 > 0.85:
-            print("   ✅ Excellent performance - ready for production")
+            print("   Excellent performance - ready for production")
         elif best_f1 > 0.75:
-            print("   ⚠️  Good performance - consider fine-tuning")
+            print("   Good performance - consider fine-tuning")
         else:
-            print("   ❌ Needs improvement - more data or feature engineering required")
+            print("   Needs improvement - more data or feature engineering required")
 
 if __name__ == "__main__":
     evaluator = DetailedEvaluator('results/detection_results.json')

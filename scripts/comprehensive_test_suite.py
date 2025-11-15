@@ -9,8 +9,12 @@ Chạy: python -m scripts.comprehensive_test_suite
 
 import pandas as pd
 import numpy as np
-import json
-from pathlib import Path
+import        print("COMPREHENSIVE TESTING REPORT")
+        print("="*60)
+        
+        if not all_results:
+            print("No test results available")
+            returnfrom pathlib import Path
 from datetime import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -66,7 +70,7 @@ class ComprehensiveModelTester:
         
     def test_on_dataset(self, dataset_path, dataset_name):
         """Test model trên một dataset"""
-        print(f"\n🧪 Testing on {dataset_name} Dataset")
+        print(f"\nTesting on {dataset_name} Dataset")
         print("-" * 50)
         
         # Load data
@@ -135,7 +139,7 @@ class ComprehensiveModelTester:
         }
         
         # Print summary
-        print(f"\n📊 Results Summary for {dataset_name}:")
+        print(f"\nResults Summary for {dataset_name}:")
         for model_name, metrics in evaluation_results.items():
             print(f"  {model_name.replace('_', ' ').title()}:")
             print(f"    F1: {metrics['f1_score']:.4f}")
@@ -215,7 +219,7 @@ class ComprehensiveModelTester:
         
     def run_comprehensive_test(self):
         """Chạy test trên tất cả datasets"""
-        print("🚀 COMPREHENSIVE MODEL TESTING SUITE")
+        print("COMPREHENSIVE MODEL TESTING SUITE")
         print("=" * 60)
         
         # Find available datasets
@@ -224,9 +228,9 @@ class ComprehensiveModelTester:
         print("Available datasets:")
         for name, path in datasets.items():
             if path:
-                print(f"  ✅ {name.title()}: {path}")
+                print(f"  {name.title()}: {path}")
             else:
-                print(f"  ❌ {name.title()}: Not found")
+                print(f"  {name.title()}: Not found")
         
         # Test on each available dataset
         for name, path in datasets.items():
@@ -234,7 +238,7 @@ class ComprehensiveModelTester:
                 try:
                     self.test_on_dataset(path, name)
                 except Exception as e:
-                    print(f"❌ Error testing on {name}: {str(e)}")
+                    print(f"Error testing on {name}: {str(e)}")
                     continue
         
         # Generate comprehensive report
@@ -256,7 +260,7 @@ class ComprehensiveModelTester:
             return
             
         # Performance comparison table
-        print(f"\n🎯 PERFORMANCE COMPARISON ACROSS DATASETS:")
+        print(f"\nPERFORMANCE COMPARISON ACROSS DATASETS:")
         
         # Create comparison DataFrame
         comparison_data = []
@@ -280,7 +284,7 @@ class ComprehensiveModelTester:
         print(df_comparison.to_string(index=False, float_format='%.4f'))
         
         # Dataset difficulty analysis
-        print(f"\n📊 DATASET DIFFICULTY ANALYSIS:")
+        print(f"\nDATASET DIFFICULTY ANALYSIS:")
         for dataset_name, results in self.results.items():
             stats = results['dataset_stats']
             avg_f1 = np.mean([m['f1_score'] for m in results['evaluation_results'].values()])
@@ -301,7 +305,7 @@ class ComprehensiveModelTester:
                 print(f"    ❤️ Assessment: Very difficult")
         
         # Error analysis
-        print(f"\n🔍 ERROR ANALYSIS:")
+        print(f"\nERROR ANALYSIS:")
         for dataset_name, results in self.results.items():
             if 'detailed_analysis' in results:
                 analysis = results['detailed_analysis']
@@ -322,13 +326,13 @@ class ComprehensiveModelTester:
                         print(f"      {i+1}. \"{fn['text']}\" (confidence: {fn['probability']:.3f})")
         
         # Recommendations
-        print(f"\n💡 RECOMMENDATIONS:")
+        print(f"\nRECOMMENDATIONS:")
         
         # Check for overfitting on simple dataset
         if 'simple' in self.results:
             simple_avg = np.mean([m['f1_score'] for m in self.results['simple']['evaluation_results'].values()])
             if simple_avg > 0.98:
-                print("  ⚠️  Models may be overfitting on simple synthetic data")
+                print("  Models may be overfitting on simple synthetic data")
         
         # Compare performance drops
         if 'simple' in self.results and 'challenging' in self.results:
@@ -344,7 +348,7 @@ class ComprehensiveModelTester:
         if 'realworld' in self.results:
             realworld_f1 = np.mean([m['f1_score'] for m in self.results['realworld']['evaluation_results'].values()])
             if realworld_f1 < 0.8:
-                print(f"  🎯 Real-world performance needs improvement ({realworld_f1:.3f})")
+                print(f"  Real-world performance needs improvement ({realworld_f1:.3f})")
                 print("      → Focus on reducing false positives")
                 print("      → Improve context understanding")
         
@@ -356,7 +360,7 @@ class ComprehensiveModelTester:
         if not self.results or len(self.results) < 2:
             return
             
-        print(f"\n📊 Creating visualizations...")
+        print(f"\nCreating visualizations...")
         
         # Create results directory
         results_dir = Path('../results')
@@ -416,7 +420,7 @@ class ComprehensiveModelTester:
         plt.savefig(results_dir / 'comprehensive_performance_analysis.png', dpi=300, bbox_inches='tight')
         plt.close()
         
-        print(f"  📈 Performance charts saved to {results_dir / 'comprehensive_performance_analysis.png'}")
+        print(f"  Performance charts saved to {results_dir / 'comprehensive_performance_analysis.png'}")
         
     def save_detailed_report(self):
         """Lưu báo cáo chi tiết"""
@@ -456,8 +460,8 @@ def main():
     tester = ComprehensiveModelTester()
     results = tester.run_comprehensive_test()
     
-    print(f"\n✅ Comprehensive testing completed!")
-    print(f"📊 Check the results/ folder for detailed analysis and visualizations")
+    print(f"\nComprehensive testing completed!")
+    print(f"Check the results/ folder for detailed analysis and visualizations")
     
     return results
 

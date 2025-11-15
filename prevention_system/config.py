@@ -4,7 +4,7 @@ Lý do: Centralized config cho tất cả prevention components với các thres
 """
 
 from pathlib import Path
-import yaml
+# import yaml  # Commented out to avoid dependency issues
 
 class PreventionConfig:
     # Base paths
