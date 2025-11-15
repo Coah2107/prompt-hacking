@@ -154,8 +154,8 @@ class TraditionalMLDetector:
         
         # Train model với progress indication
         if not progress_callback:
-            print(f"🔄 Training {model_name}...")
-            print(f"   📊 Data: {X_train.shape[0]:,} samples, {X_train.shape[1]:,} features")
+            print(f"Training {model_name}...")
+            print(f"   Data: {X_train.shape[0]:,} samples, {X_train.shape[1]:,} features")
         
         # Progress updates every 10%
         def update_progress(progress, stage):
@@ -179,7 +179,7 @@ class TraditionalMLDetector:
         update_progress(50, "Fitting")
         
         if not progress_callback:
-            print(f"   ⚡ Fitting model... ✅ ({fit_time:.1f}s)")
+            print(f"   Fitting model... Done ({fit_time:.1f}s)")
         
         # Stage 2: Cross-validation (50-100%)
         update_progress(50, "CV")
@@ -198,8 +198,8 @@ class TraditionalMLDetector:
         update_progress(90, "CV")
         
         if not progress_callback:
-            print(f"   🔍 Cross-validation ({self.config.CV_FOLDS} folds)... ✅ ({cv_time:.1f}s)")
-            print(f"   📈 CV F1: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
+            print(f"   Cross-validation ({self.config.CV_FOLDS} folds)... Done ({cv_time:.1f}s)")
+            print(f"   CV F1: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
         
         # Validation evaluation if provided
         if X_val is not None and y_val is not None:
@@ -239,10 +239,10 @@ class TraditionalMLDetector:
             try:
                 model = self.train_single_model(model_name, X_train, y_train, X_val, y_val)
                 results[model_name] = self.trained_models[model_name]
-                print(f"✅ {model_name} trained successfully")
+                print(f"{model_name} trained successfully")
                 
             except Exception as e:
-                print(f"❌ Error training {model_name}: {str(e)}")
+                print(f"Error training {model_name}: {str(e)}")
                 results[model_name] = {'error': str(e)}
         
         return results
@@ -329,9 +329,9 @@ class TraditionalMLDetector:
                         joblib.dump(model_data['model'], model_path)
                         print(f"Saved {model_name} to {model_path}")
                     else:
-                        print(f"⚠️  Warning: {model_name} data structure invalid: {type(model_data)}")
+                        print(f"WARNING: {model_name} data structure invalid: {type(model_data)}")
                 except Exception as e:
-                    print(f"❌ Error saving {model_name}: {str(e)}")
+                    print(f"ERROR saving {model_name}: {str(e)}")
     
     def load_model(self, model_path):
         """
@@ -442,7 +442,7 @@ if __name__ == "__main__":
         challenging_files = list(datasets_dir.glob('challenging_dataset_*.csv'))
         if challenging_files:
             dataset_path = max(challenging_files, key=lambda x: x.stat().st_mtime)
-            print(f"📊 Using challenging dataset: {dataset_path.name}")
+            print(f"Using challenging dataset: {dataset_path.name}")
         else:
             # Fallback to old path
             dataset_path = datasets_dir / 'full_dataset.csv'
@@ -451,14 +451,14 @@ if __name__ == "__main__":
         dataset_path = os.path.join(detection_system_dir, '..', 'datasets', 'full_dataset.csv')
     
     if not os.path.exists(dataset_path):
-        print(f"❌ Dataset not found at {dataset_path}")
+        print(f"Dataset not found at {dataset_path}")
         print("Please ensure you have datasets available in datasets/ directory")
         exit(1)
     
     # Load dataset
     import pandas as pd
     df = pd.read_csv(dataset_path)
-    print(f"📊 Dataset loaded: {df.shape[0]} samples")
+    print(f"Dataset loaded: {df.shape[0]} samples")
     print(f"Columns: {df.columns.tolist()}")
     
     # Prepare data
@@ -470,7 +470,7 @@ if __name__ == "__main__":
     print(f"  Benign: {len(sample_labels) - sum(sample_labels)}")
     
     # Analyze dataset characteristics
-    print(f"\n🔍 DATASET ANALYSIS:")
+    print(f"\nDATASET ANALYSIS:")
     malicious_texts = [text for text, label in zip(sample_texts, sample_labels) if label == 1]
     benign_texts = [text for text, label in zip(sample_texts, sample_labels) if label == 0]
     
@@ -501,7 +501,7 @@ if __name__ == "__main__":
         print(f"  {i+1}. \"{benign_texts[i][:80]}...\"")
     
     if malicious_with_keywords > len(malicious_texts) * 0.8:
-        print(f"\n⚠️  WARNING: {malicious_with_keywords/len(malicious_texts)*100:.1f}% of malicious prompts contain obvious keywords!")
+        print(f"\nWARNING: {malicious_with_keywords/len(malicious_texts)*100:.1f}% of malicious prompts contain obvious keywords!")
         print("This makes classification trivially easy and unrealistic.")
     
     # Extract features using TestConfig
@@ -563,7 +563,7 @@ if __name__ == "__main__":
         if evaluation_results:
             best_model_name, best_score = detector.get_best_model(evaluation_results)
             
-            print(f"\n🏆 BEST MODEL: {best_model_name}")
+            print(f"\nBEST MODEL: {best_model_name}")
             print(f"F1 Score: {best_score:.4f}")
             print(f"AUC Score: {evaluation_results[best_model_name]['auc_score']:.4f}")
             
@@ -577,7 +577,7 @@ if __name__ == "__main__":
             
             # Analyze feature importance (for interpretable models)
             if best_model_name in ['logistic_regression', 'random_forest']:
-                print(f"\n🔍 ANALYZING PERFECT RESULTS:")
+                print(f"\nANALYZING PERFECT RESULTS:")
                 print("This may indicate:")
                 print("  1. Dataset is too simple/synthetic")
                 print("  2. Features perfectly separate classes") 
@@ -597,7 +597,7 @@ if __name__ == "__main__":
             best_model = detector.trained_models[best_model_name]['model']
             
             # Check probability distributions  
-            print(f"\n📊 PROBABILITY ANALYSIS:")
+            print(f"\nPROBABILITY ANALYSIS:")
             try:
                 # Get prediction probabilities
                 probabilities = best_model.predict_proba(X_test)[:, 1]  # Probability of malicious class
@@ -611,17 +611,17 @@ if __name__ == "__main__":
                 print(f"Uncertain predictions (0.3-0.7): {uncertain}/{len(probabilities)}")
                 
                 if uncertain == 0:
-                    print("⚠️  WARNING: No uncertain predictions - dataset may be too simple!")
+                    print("WARNING: No uncertain predictions - dataset may be too simple!")
                     
                 # Check for extreme probabilities (signs of overfitting)
                 extreme_probs = np.sum((probabilities < 0.01) | (probabilities > 0.99))
                 print(f"Extreme probabilities (<0.01 or >0.99): {extreme_probs}/{len(probabilities)} ({extreme_probs/len(probabilities)*100:.1f}%)")
                 
             except Exception as e:
-                print(f"❌ Error analyzing probabilities: {e}")
+                print(f"ERROR analyzing probabilities: {e}")
             
             # Analyze dataset characteristics
-            print(f"\n🔍 DATASET QUALITY ANALYSIS:")
+            print(f"\nDATASET QUALITY ANALYSIS:")
             
             try:
                 # Convert sparse matrix to dense if needed
@@ -647,13 +647,13 @@ if __name__ == "__main__":
                 
                 print(f"Features with perfect class separation: {perfect_features}/{X_test_dense.shape[1]}")
                 if perfect_features > 10:
-                    print("⚠️  Many features perfectly separate classes - dataset may be too synthetic!")
+                    print("WARNING: Many features perfectly separate classes - dataset may be too synthetic!")
                     
             except Exception as e:
-                print(f"❌ Error analyzing feature separation: {e}")
+                print(f"ERROR analyzing feature separation: {e}")
             
             # Text pattern analysis  
-            print(f"\n📝 TEXT PATTERN ANALYSIS:")
+            print(f"\nTEXT PATTERN ANALYSIS:")
             # Load dataset again for analysis
             import pandas as pd
             df = pd.read_csv(dataset_path)
@@ -688,7 +688,7 @@ if __name__ == "__main__":
             print(f"  Benign: {ben_with_triggers}/{len(benign_samples)} ({ben_with_triggers/len(benign_samples)*100:.1f}%)")
             
             if mal_with_triggers > len(malicious_samples) * 0.5:
-                print("⚠️  Over 50% of malicious samples contain obvious trigger words!")
+                print("WARNING: Over 50% of malicious samples contain obvious trigger words!")
             
             # Convert sparse matrix to dense for SVM if needed
             X_test_pred = X_test
@@ -706,7 +706,7 @@ if __name__ == "__main__":
                 text_idx = X_test.getrow(i) if hasattr(X_test, 'getrow') else i
                 original_idx = i  # This is approximate since we don't track original indices
                 
-                status = "✅" if predictions[i] == y_test[i] else "❌"
+                status = "CORRECT" if predictions[i] == y_test[i] else "WRONG"
                 prob = probabilities[i] if hasattr(probabilities, '__len__') else probabilities
                 
                 print(f"{status} Pred: {predictions[i]} (prob: {prob:.3f}, actual: {y_test[i]})")
@@ -718,14 +718,14 @@ if __name__ == "__main__":
             # Save models
             models_dir = os.path.join(detection_system_dir, 'saved_models')
             detector.save_models(models_dir)
-            print(f"\n💾 Models saved to: {models_dir}")
+            print(f"\nModels saved to: {models_dir}")
         
         else:
-            print("❌ No models were successfully trained and evaluated")
+            print("ERROR: No models were successfully trained and evaluated")
             
     except Exception as e:
-        print(f"❌ Error during training/evaluation: {e}")
+        print(f"ERROR during training/evaluation: {e}")
         import traceback
         traceback.print_exc()
         
-    print("\n✅ Traditional ML detector test completed!")
+    print("\nTraditional ML detector test completed!")

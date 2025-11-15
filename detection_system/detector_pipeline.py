@@ -55,14 +55,14 @@ class DetectionPipeline:
             
             if ENABLE_SAMPLING:
                 if len(train_df) > MAX_TRAIN_SAMPLES:
-                    print(f"⚡ Sampling train set: {len(train_df)} → {MAX_TRAIN_SAMPLES}")
+                    print(f"Sampling train set: {len(train_df)} → {MAX_TRAIN_SAMPLES}")
                     train_df = train_df.sample(n=MAX_TRAIN_SAMPLES, random_state=42)
                     
                 if len(test_df) > MAX_TEST_SAMPLES:
-                    print(f"⚡ Sampling test set: {len(test_df)} → {MAX_TEST_SAMPLES}")
+                    print(f"Sampling test set: {len(test_df)} → {MAX_TEST_SAMPLES}")
                     test_df = test_df.sample(n=MAX_TEST_SAMPLES, random_state=42)
             else:
-                print(f"🚀 Using full datasets for maximum performance")
+                print(f"Using full datasets for maximum performance")
             
             # Clean data - remove rows with missing prompts or invalid data
             train_df = train_df.dropna(subset=['prompt', 'label'])
@@ -153,7 +153,7 @@ class DetectionPipeline:
         print("\n=== ML-BASED DETECTION ===")
         
         # Prepare features
-        print("🔧 Preparing features...")
+        print("Preparing features...")
         X_train = self.ml_detector.prepare_features(
             train_features['statistical_features'],
             train_features['tfidf_features']
@@ -168,17 +168,17 @@ class DetectionPipeline:
         y_test = np.array(data['test_labels'])
         
         # Train all models với progress tracking
-        print(f"🚀 Training features shape: {X_train.shape}")
-        print(f"📊 Training on {len(y_train):,} samples")
+        print(f"Training features shape: {X_train.shape}")
+        print(f"Training on {len(y_train):,} samples")
         
         # Get list of models to train
         models_to_train = list(self.ml_detector.models.keys())
-        print(f"🎯 Training {len(models_to_train)} models: {', '.join(models_to_train)}")
+        print(f"Training {len(models_to_train)} models: {', '.join(models_to_train)}")
         
         training_results = {}
         
         # Single-line progress bar for all models  
-        print("\n🚀 Training Models:")
+        print("\nTraining Models:")
         
         # Train each model with single-line progress
         for i, model_name in enumerate(models_to_train, 1):
@@ -192,7 +192,7 @@ class DetectionPipeline:
                     filled_length = int(bar_length * progress // 100)
                     bar = '█' * filled_length + '░' * (bar_length - filled_length)
                     # Update same line with \r
-                    print(f"\r📈 [{i}/{len(models_to_train)}] {model_name}: [{bar}] {progress:.0f}% {stage}", end="", flush=True)
+                    print(f"\r[{i}/{len(models_to_train)}] {model_name}: [{bar}] {progress:.0f}% {stage}", end="", flush=True)
                     
             # Train single model
             trained_model = self.ml_detector.train_single_model(
@@ -207,16 +207,16 @@ class DetectionPipeline:
             
             # Final result on same line with proper clearing
             bar = '█' * 30  # Full progress bar
-            print(f"\r📈 [{i}/{len(models_to_train)}] {model_name}: [{bar}] 100% ✅ Done ({elapsed:.1f}s) - F1: {result['cv_mean']:.4f}")
+            print(f"\r[{i}/{len(models_to_train)}] {model_name}: [{bar}] 100% Done ({elapsed:.1f}s) - F1: {result['cv_mean']:.4f}")
             
         print()  # New line after all models
         
-        print("\n🔍 Evaluating all models...")
+        print("\nEvaluating all models...")
         evaluation_results = self.ml_detector.evaluate_all_models(X_test, y_test)
         
         # Find best model
         best_model, best_score = self.ml_detector.get_best_model(evaluation_results)
-        print(f"\n🏆 Best model: {best_model} (F1 Score: {best_score:.4f})")
+        print(f"\nBest model: {best_model} (F1 Score: {best_score:.4f})")
         
         return evaluation_results, best_model
     
@@ -224,7 +224,7 @@ class DetectionPipeline:
         """
         Chạy toàn bộ detection pipeline
         """
-        print("🚀 Starting Full Detection Pipeline")
+        print("Starting Full Detection Pipeline")
         print("=" * 50)
         
         results = {
@@ -260,11 +260,11 @@ class DetectionPipeline:
             # 6. Generate comparison report
             self.generate_comparison_report(results)
             
-            print("\n✅ Pipeline completed successfully!")
+            print("\nPipeline completed successfully!")
             return results
             
         except Exception as e:
-            print(f"❌ Pipeline failed: {str(e)}")
+            print(f"Pipeline failed: {str(e)}")
             results['error'] = str(e)
             return results
     
