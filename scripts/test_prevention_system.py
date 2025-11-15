@@ -38,9 +38,9 @@ class IntegratedSecuritySystem:
             # Try to load pre-trained models
             self.ml_detector.load_models(DetectionConfig.MODELS_DIR)
             self.ml_models_available = True
-            print("✅ Loaded pre-trained ML models")
+            print("Loaded pre-trained ML models")
         except Exception as e:
-            print(f"⚠️ ML models not available: {e}")
+            print(f"ML models not available: {e}")
             self.ml_models_available = False
     
     def analyze_prompt(self, prompt: str, user_id: str = "test_user"):
@@ -89,7 +89,7 @@ class IntegratedSecuritySystem:
                         analysis['security_layers'].append('all_layers_passed')
                         
                 except Exception as e:
-                    print(f"❌ ML detection error: {e}")
+                    print(f"ML detection error: {e}")
                     # Fall back to filter result only
                     analysis['final_decision'] = {
                         'allowed': filter_result['allowed'],
@@ -158,7 +158,7 @@ class IntegratedSecuritySystem:
                 }
                 
         except Exception as e:
-            print(f"❌ ML detection failed: {e}")
+            print(f"ML detection failed: {e}")
             return {
                 'is_malicious': False,
                 'confidence': 0.0,
@@ -219,7 +219,7 @@ def run_comprehensive_test():
     """
     Run comprehensive test of integrated security system
     """
-    print("🔒 INTEGRATED SECURITY SYSTEM TEST")
+    print("INTEGRATED SECURITY SYSTEM TEST")
     print("=" * 60)
     
     # Initialize system
@@ -317,10 +317,10 @@ def run_comprehensive_test():
         
         if test_passed:
             results['passed'] += 1
-            status = "✅ PASS"
+            status = "PASS"
         else:
             results['failed'] += 1
-            status = "❌ FAIL"
+            status = "FAIL"
         
         print(f"Expected: {expected}")
         print(f"Result: {'ALLOWED' if allowed else 'BLOCKED'} (risk: {analysis['final_decision']['risk_level']})")
@@ -337,14 +337,14 @@ def run_comprehensive_test():
         })
     
     # Summary
-    print(f"\n📊 TEST SUMMARY")
+    print(f"\nTEST SUMMARY")
     print("=" * 30)
     print(f"Total tests: {results['total_tests']}")
     print(f"Passed: {results['passed']} ({results['passed']/results['total_tests']*100:.1f}%)")
     print(f"Failed: {results['failed']} ({results['failed']/results['total_tests']*100:.1f}%)")
     
     # System statistics
-    print(f"\n🛡️ PREVENTION FILTER STATS")
+    print(f"\nPREVENTION FILTER STATS")
     filter_stats = security_system.input_filter.get_statistics()
     for key, value in filter_stats.items():
         if isinstance(value, float):

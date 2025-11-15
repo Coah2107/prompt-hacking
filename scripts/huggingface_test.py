@@ -43,7 +43,7 @@ class HuggingFaceModelTester:
         hf_files = list(datasets_dir.glob('huggingface_dataset_*.csv'))
         
         if not hf_files:
-            print("❌ No HuggingFace dataset found. Run huggingface_downloader.py first.")
+            print("No HuggingFace dataset found. Run huggingface_downloader.py first.")
             return None
             
         # Use the most recent file
@@ -52,7 +52,7 @@ class HuggingFaceModelTester:
     
     def load_and_sample_dataset(self, dataset_path, sample_size=10000):
         """Load và sample dataset để test nhanh"""
-        print(f"📊 Loading HuggingFace dataset: {dataset_path}")
+        print(f"Loading HuggingFace dataset: {dataset_path}")
         
         df = pd.read_csv(dataset_path)
         
@@ -62,7 +62,7 @@ class HuggingFaceModelTester:
         
         # Sample for faster testing if dataset is very large
         if len(df) > sample_size:
-            print(f"\n📝 Sampling {sample_size} samples for testing...")
+            print(f"\nSampling {sample_size} samples for testing...")
             # Stratified sampling to maintain label balance
             df_sample = df.groupby('label', group_keys=False).apply(
                 lambda x: x.sample(min(len(x), sample_size//2), random_state=42)
@@ -131,7 +131,7 @@ class HuggingFaceModelTester:
         evaluation_results = ml_detector.evaluate_all_models(X_test, np.array(y_test))
         
         # Print results
-        print(f"\n📈 Results:")
+        print(f"\nResults:")
         for model_name, metrics in evaluation_results.items():
             print(f"  {model_name.replace('_', ' ').title()}:")
             print(f"    F1: {metrics['f1_score']:.4f}")
@@ -155,7 +155,7 @@ class HuggingFaceModelTester:
     
     def analyze_dataset_characteristics(self, df):
         """Phân tích đặc điểm của HuggingFace dataset"""
-        print(f"\n🔍 DATASET ANALYSIS")
+        print(f"\nDATASET ANALYSIS")
         print("-" * 40)
         
         # Text length analysis
@@ -200,7 +200,7 @@ class HuggingFaceModelTester:
     
     def compare_with_other_datasets(self):
         """So sánh với datasets khác đã test trước đó"""
-        print(f"\n📊 PERFORMANCE COMPARISON")
+        print(f"\nPERFORMANCE COMPARISON")
         print("=" * 60)
         
         # Load previous results if available
@@ -249,7 +249,7 @@ class HuggingFaceModelTester:
                 print(row)
         
         # Dataset size comparison
-        print(f"\n📊 Dataset Characteristics:")
+        print(f"\nDataset Characteristics:")
         print("-" * 60)
         for dataset_name, results in all_results.items():
             if 'dataset_stats' in results:
@@ -261,7 +261,7 @@ class HuggingFaceModelTester:
     
     def run_huggingface_test(self, sample_size=10000):
         """Chạy test trên HuggingFace dataset"""
-        print("🚀 HUGGINGFACE DATASET PERFORMANCE TEST")
+        print("HUGGINGFACE DATASET PERFORMANCE TEST")
         print("=" * 70)
         
         # Find dataset
@@ -284,7 +284,7 @@ class HuggingFaceModelTester:
         # Save results
         self.save_results()
         
-        print(f"\n✅ HuggingFace dataset testing completed!")
+        print(f"\nHuggingFace dataset testing completed!")
         return True
     
     def save_results(self):
@@ -334,7 +334,7 @@ def main():
     success = tester.run_huggingface_test(sample_size)
     
     if success:
-        print(f"\n🎯 KEY INSIGHTS:")
+        print(f"\nKEY INSIGHTS:")
         print("  • HuggingFace dataset provides large-scale realistic testing")
         print("  • Compare performance with smaller synthetic datasets") 
         print("  • Check for overfitting vs real-world generalization")

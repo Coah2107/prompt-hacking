@@ -96,7 +96,7 @@ class PreventionConfig:
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
         
-        print("📁 Created prevention system directories")
+        print("Created prevention system directories")
     
     @classmethod
     def load_custom_config(cls, config_path):
@@ -110,11 +110,11 @@ class PreventionConfig:
                 if hasattr(cls, key):
                     setattr(cls, key, value)
             
-            print(f"✅ Loaded custom config from {config_path}")
+            print(f"Loaded custom config from {config_path}")
         except FileNotFoundError:
-            print(f"⚠️ Custom config file not found: {config_path}")
+            print(f"Custom config file not found: {config_path}")
         except Exception as e:
-            print(f"❌ Error loading custom config: {e}")
+            print(f"Error loading custom config: {e}")
 
 # Aliases for compatibility
 Config = PreventionConfig

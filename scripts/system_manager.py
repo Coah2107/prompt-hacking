@@ -49,16 +49,16 @@ class SystemManager:
     
     def display_banner(self):
         """Display system banner"""
-        print("🛡️" * 30)
-        print("🚀 PROMPT HACKING DETECTION & PREVENTION SYSTEM")
-        print("🔒 Advanced AI Safety & Security Framework")
-        print("⚡ Version 1.0 - Production Ready")
-        print("📅 " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print("🛡️" * 30)
+        print("=" * 30)
+        print("PROMPT HACKING DETECTION & PREVENTION SYSTEM")
+        print("Advanced AI Safety & Security Framework")
+        print("Version 1.0 - Production Ready")
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print("=" * 30)
     
     def display_system_status(self):
         """Show current system status"""
-        print("\n📊 SYSTEM STATUS")
+        print("\nSYSTEM STATUS")
         print("-" * 50)
         
         # Check key directories
@@ -73,7 +73,7 @@ class SystemManager:
         
         for dir_name in key_dirs:
             dir_path = Path(self.project_root) / dir_name
-            status = "✅" if dir_path.exists() else "❌"
+            status = "[OK]" if dir_path.exists() else "[MISSING]"
             print(f"{status} {dir_name}")
         
         # Check key scripts
@@ -84,15 +84,15 @@ class SystemManager:
             'utils/path_utils.py'
         ]
         
-        print("\n📝 Key Scripts:")
+        print("\nKey Scripts:")
         for script in key_scripts:
             script_path = Path(self.project_root) / script
-            status = "✅" if script_path.exists() else "❌"
+            status = "[OK]" if script_path.exists() else "[MISSING]"
             print(f"{status} {script}")
     
     def display_available_commands(self):
         """Display all available commands"""
-        print("\n🎯 AVAILABLE COMMANDS")
+        print("\nAVAILABLE COMMANDS")
         print("-" * 50)
         
         for i, (cmd, info) in enumerate(self.available_commands.items(), 1):

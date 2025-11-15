@@ -4,7 +4,13 @@ Lý do: Deep analysis kết quả để understand strengths/weaknesses của t�
 """
 
 import pandas as pd
-import numpy as np
+impor        print(f"\nRECOMMENDATIONS:")
+        if best_f1 >= 0.8:
+            print("   Excellent performance - ready for production")
+        elif best_f1 >= 0.6:
+            print("   Good performance - consider fine-tuning")
+        else:
+            print("   Needs improvement - more data or feature engineering required") as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report, roc_curve, auc
@@ -132,14 +138,14 @@ class DetailedEvaluator:
         best_model = self.results['best_model']
         best_f1 = self.results['ml_based'][best_model]['f1_score']
         
-        print(f"\n🏆 BEST PERFORMING MODEL: {best_model.upper()}")
+        print(f"\nBEST PERFORMING MODEL: {best_model.upper()}")
         print(f"   F1 Score: {best_f1:.4f}")
         print(f"   Precision: {self.results['ml_based'][best_model]['precision']:.4f}")
         print(f"   Recall: {self.results['ml_based'][best_model]['recall']:.4f}")
         
         # Rule-based performance
         rule_f1 = self.results['rule_based']['f1_score']
-        print(f"\n📋 RULE-BASED DETECTOR:")
+        print(f"\nRULE-BASED DETECTOR:")
         print(f"   F1 Score: {rule_f1:.4f}")
         print(f"   Precision: {self.results['rule_based']['precision']:.4f}")
         print(f"   Recall: {self.results['rule_based']['recall']:.4f}")
@@ -147,7 +153,7 @@ class DetailedEvaluator:
         
         # Improvement analysis
         improvement = ((best_f1 - rule_f1) / rule_f1) * 100
-        print(f"\n📈 IMPROVEMENT:")
+        print(f"\nIMPROVEMENT:")
         print(f"   ML vs Rule-based: {improvement:+.1f}% F1 score improvement")
         
         # Recommendations
@@ -169,4 +175,4 @@ if __name__ == "__main__":
     
     # Save comparison data
     comparison_df.to_csv('results/model_comparison.csv', index=False)
-    print("\n📊 Evaluation completed! Check results/ folder for outputs.")
+    print("\nEvaluation completed! Check results/ folder for outputs.")

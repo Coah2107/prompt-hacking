@@ -15,3 +15,4 @@ venv/
 !datasets/sample_*.json
 !model_comparison.csv
 !detection_results.json
+.github/

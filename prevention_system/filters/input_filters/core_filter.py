@@ -111,7 +111,7 @@ class CoreInputFilter:
             try:
                 compiled_patterns.append(re.compile(pattern, re.IGNORECASE))
             except re.error as e:
-                print(f"⚠️ Invalid regex pattern '{pattern}': {e}")
+                print(f"Invalid regex pattern '{pattern}': {e}")
         
         return compiled_patterns
     
@@ -304,9 +304,9 @@ class CoreInputFilter:
                 compiled_pattern = re.compile(pattern, re.IGNORECASE)
                 self.blocked_patterns.append(compiled_pattern)
                 self.filter_config['blocked_patterns'].append(pattern)
-                print(f"✅ Added new pattern: {pattern}")
+                print(f"Added new pattern: {pattern}")
             except re.error as e:
-                print(f"❌ Invalid new pattern '{pattern}': {e}")
+                print(f"Invalid new pattern '{pattern}': {e}")
 
 # Create alias for compatibility
 InputFilter = CoreInputFilter
@@ -336,7 +336,7 @@ if __name__ == "__main__":
         print(f"Confidence: {result.get('confidence', 0):.2f}")
         print(f"Reasons: {result.get('reasons', [])}")
     
-    print("\n📊 Final Statistics:")
+    print("\nFinal Statistics:")
     stats = filter_system.get_statistics()
     for key, value in stats.items():
         print(f"  {key}: {value}")
