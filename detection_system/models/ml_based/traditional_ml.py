@@ -5,9 +5,11 @@ Lý do: Proven effective cho text classification, fast training và inference
 
 import pandas as pd
 import numpy as np
+import time
+import sys
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC, LinearSVC
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 from sklearn.model_selection import cross_val_score, StratifiedKFold
@@ -56,36 +58,53 @@ class TraditionalMLDetector:
             
             'random_forest': {
                 'model': RandomForestClassifier(
-                    n_estimators=100,  # Số trees
+                    n_estimators=50,   # Reduced from 100 for faster training
                     random_state=self.config.RANDOM_STATE,
-                    max_depth=None,  # Unlimited depth
-                    min_samples_split=2,  # Min samples to split
-                    min_samples_leaf=1,  # Min samples in leaf
-                    class_weight='balanced'  # Handle imbalanced data
+                    max_depth=15,      # Limited depth for speed
+                    min_samples_split=5,  # Increased for speed
+                    min_samples_leaf=2,   # Increased for speed
+                    class_weight='balanced',  # Handle imbalanced data
+                    n_jobs=-1          # Use all CPU cores
                 ),
-                'description': 'Ensemble method, handles non-linear patterns well'
+                'description': 'Fast ensemble method, handles non-linear patterns well'
             },
             
             'svm': {
-                'model': SVC(
-                    kernel='rbf',  # Radial basis function kernel
+                'model': LinearSVC(
+                    C=0.1,  # Lower C for faster training (less strict)
                     random_state=self.config.RANDOM_STATE,
-                    probability=True,  # Enable probability estimates
-                    C=1.0,  # Regularization
-                    gamma='scale',  # Kernel coefficient
-                    class_weight='balanced'
+                    class_weight='balanced',
+                    tol=1e-2,  # Relaxed tolerance for faster convergence
+                    max_iter=2000,  # Limited iterations for speed
+                    dual=False,  # Use primal formulation (faster for n_samples > n_features)
+                    loss='squared_hinge'  # Faster loss function
                 ),
-                'description': 'Powerful for high-dimensional data like text'
+                'description': 'Ultra-fast Linear SVM - 10x faster than SVC (no probability support)'
+            },
+            
+            'svm_fast': {
+                'model': SGDClassifier(
+                    loss='hinge',      # SVM loss function
+                    alpha=0.01,        # Regularization strength
+                    random_state=self.config.RANDOM_STATE,
+                    max_iter=1000,     # Fast convergence
+                    tol=1e-3,         # Tolerance for stopping
+                    class_weight='balanced',
+                    learning_rate='optimal',  # Automatic learning rate
+                    n_jobs=-1         # Use all CPU cores
+                ),
+                'description': 'Ultra-fast SGD SVM - 10-100x faster than regular SVM'
             },
             
             'gradient_boosting': {
                 'model': GradientBoostingClassifier(
-                    n_estimators=100,
-                    learning_rate=0.1,
-                    max_depth=3,
-                    random_state=self.config.RANDOM_STATE
+                    n_estimators=50,   # Reduced from 100 for speed
+                    learning_rate=0.2, # Increased for faster convergence
+                    max_depth=5,       # Limited depth
+                    random_state=self.config.RANDOM_STATE,
+                    subsample=0.8      # Use subset for faster training
                 ),
-                'description': 'Sequential ensemble, often high performance'
+                'description': 'Fast sequential ensemble with good performance'
             },
             
             'naive_bayes': {
@@ -105,53 +124,105 @@ class TraditionalMLDetector:
         """
         from scipy.sparse import hstack, csr_matrix
         
+        # Handle negative values in statistical features (MultinomialNB requirement)
+        X_statistical_positive = np.maximum(X_statistical, 0)  # Replace negative with 0
+        
         # Convert statistical features to sparse matrix
-        X_statistical_sparse = csr_matrix(X_statistical)
+        X_statistical_sparse = csr_matrix(X_statistical_positive)
         
         # Combine features
         X_combined = hstack([X_statistical_sparse, X_tfidf])
         
+        # Final check: ensure no negative values for MultinomialNB
+        if hasattr(X_combined, 'data'):
+            X_combined.data = np.maximum(X_combined.data, 0)
+        else:
+            X_combined = np.maximum(X_combined.toarray(), 0)
+            X_combined = csr_matrix(X_combined)
+        
         return X_combined
     
-    def train_single_model(self, model_name, X_train, y_train, X_val=None, y_val=None):
+    def train_single_model(self, model_name, X_train, y_train, X_val=None, y_val=None, progress_callback=None):
         """
-        Train một model cụ thể
+        Train một model cụ thể với progress tracking
         Lý do: Modular approach, có thể train từng model riêng biệt
         """
-        print(f"\n=== Training {model_name} ===")
+        import sys
         
         model_config = self.models[model_name]
         model = model_config['model']
         
-        # Train model
-        print(f"Training on {X_train.shape[0]} samples with {X_train.shape[1]} features")
-        model.fit(X_train, y_train)
+        # Train model với progress indication
+        if not progress_callback:
+            print(f"🔄 Training {model_name}...")
+            print(f"   📊 Data: {X_train.shape[0]:,} samples, {X_train.shape[1]:,} features")
         
-        # Cross-validation score
+        # Progress updates every 10%
+        def update_progress(progress, stage):
+            if progress_callback:
+                progress_callback(stage, progress)
+                # Small delay to see progress updates
+                import time
+                time.sleep(0.05)  # 50ms delay để nhìn thấy progress
+        
+        # Stage 1: Fitting model (0-50%)
+        update_progress(0, "Fitting")
+        update_progress(10, "Fitting")
+        update_progress(20, "Fitting")
+        
+        start_time = time.time()
+        model.fit(X_train, y_train)
+        fit_time = time.time() - start_time
+        
+        update_progress(30, "Fitting")
+        update_progress(40, "Fitting")
+        update_progress(50, "Fitting")
+        
+        if not progress_callback:
+            print(f"   ⚡ Fitting model... ✅ ({fit_time:.1f}s)")
+        
+        # Stage 2: Cross-validation (50-100%)
+        update_progress(50, "CV")
+        update_progress(60, "CV")
+        
+        cv_start = time.time()
         cv_scores = cross_val_score(
             model, X_train, y_train, 
             cv=StratifiedKFold(n_splits=self.config.CV_FOLDS, shuffle=True, random_state=self.config.RANDOM_STATE),
             scoring='f1'
         )
+        cv_time = time.time() - cv_start
         
-        print(f"Cross-validation F1 scores: {cv_scores}")
-        print(f"Mean CV F1: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
+        update_progress(70, "CV")
+        update_progress(80, "CV")
+        update_progress(90, "CV")
+        
+        if not progress_callback:
+            print(f"   🔍 Cross-validation ({self.config.CV_FOLDS} folds)... ✅ ({cv_time:.1f}s)")
+            print(f"   📈 CV F1: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
         
         # Validation evaluation if provided
         if X_val is not None and y_val is not None:
+            update_progress(95, "Validation")
             val_predictions = model.predict(X_val)
             val_probabilities = model.predict_proba(X_val)[:, 1] if hasattr(model, 'predict_proba') else None
             
             val_report = classification_report(y_val, val_predictions, output_dict=True)
-            print(f"Validation F1 score: {val_report['weighted avg']['f1-score']:.4f}")
+            if not progress_callback:
+                print(f"Validation F1 score: {val_report['weighted avg']['f1-score']:.4f}")
+        
+        # Final progress
+        update_progress(100, "Done")
         
         # Store trained model
-        self.trained_models[model_name] = {
+        model_result = {
             'model': model,
             'cv_scores': cv_scores,
             'cv_mean': cv_scores.mean(),
             'cv_std': cv_scores.std()
         }
+        
+        self.trained_models[model_name] = model_result
         
         return model
     
@@ -251,9 +322,16 @@ class TraditionalMLDetector:
         
         for model_name, model_data in self.trained_models.items():
             if 'error' not in model_data:
-                model_path = save_dir / f"{model_name}.joblib"
-                joblib.dump(model_data['model'], model_path)
-                print(f"Saved {model_name} to {model_path}")
+                try:
+                    # Ensure model_data is a dict and has 'model' key
+                    if isinstance(model_data, dict) and 'model' in model_data:
+                        model_path = save_dir / f"{model_name}.joblib"
+                        joblib.dump(model_data['model'], model_path)
+                        print(f"Saved {model_name} to {model_path}")
+                    else:
+                        print(f"⚠️  Warning: {model_name} data structure invalid: {type(model_data)}")
+                except Exception as e:
+                    print(f"❌ Error saving {model_name}: {str(e)}")
     
     def load_model(self, model_path):
         """

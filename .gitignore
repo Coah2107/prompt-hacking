@@ -10,7 +10,8 @@ venv/
 *.log
 .DS_Store
 *.ipynb_checkpoints/
-results/
 *.csv
 *.json
 !datasets/sample_*.json
+!model_comparison.csv
+!detection_results.json

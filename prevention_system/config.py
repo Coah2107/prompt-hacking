@@ -22,7 +22,7 @@ class PreventionConfig:
     INPUT_FILTER_CONFIG = {
         'max_prompt_length': 2000,  # Maximum characters allowed
         'max_word_count': 400,      # Maximum words allowed
-        'min_prompt_length': 5,     # Minimum characters required
+        'min_prompt_length': 1,     # Minimum characters required
         'blocked_patterns': [       # Immediate block patterns
             r'ignore\s+(?:all\s+)?previous\s+instructions',
             r'act\s+as\s+dan',

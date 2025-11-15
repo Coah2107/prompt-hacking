@@ -99,14 +99,7 @@ class CoreInputFilter:
                 'reasons': result.reasons
             }
     
-    def _filter_prompt_full(self, prompt: str, user_id: str = None) -> FilterResponse:
-        self.statistics = {
-            'total_processed': 0,
-            'blocked_count': 0,
-            'modified_count': 0,
-            'suspicious_count': 0,
-            'allowed_count': 0
-        }
+    # Remove duplicate method - use the full implementation below
         
     def _compile_patterns(self) -> List[re.Pattern]:
         """

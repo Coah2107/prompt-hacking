@@ -13,21 +13,21 @@ class Config:
     MODELS_DIR = BASE_DIR / "detection_system" / "saved_models"
     RESULTS_DIR = BASE_DIR / "results"
     
-    # Dataset files
-    TRAIN_DATA = DATASET_DIR / "train_dataset.csv"
-    TEST_DATA = DATASET_DIR / "test_dataset.csv"
-    FULL_DATA = DATASET_DIR / "full_dataset.csv"
+    # Dataset files - Updated to use HuggingFace datasets
+    TRAIN_DATA = DATASET_DIR / "huggingface_train_20251113_050346.csv"
+    TEST_DATA = DATASET_DIR / "huggingface_test_20251113_050346.csv"
+    FULL_DATA = DATASET_DIR / "huggingface_dataset_20251113_050346.csv"
     
-    # Model parameters
+    # Model parameters - Optimized for faster training
     RANDOM_STATE = 42  # Để reproducible results
     TEST_SIZE = 0.2
-    CV_FOLDS = 5  # Cross-validation folds
+    CV_FOLDS = 3  # Reduced from 5 to 3 for faster training
     
-    # Feature extraction parameters
-    MAX_FEATURES = 10000  # Số lượng features tối đa cho TF-IDF
-    MIN_DF = 2  # Minimum document frequency
-    MAX_DF = 0.95  # Maximum document frequency
-    NGRAM_RANGE = (1, 3)  # Unigrams, bigrams, trigrams
+    # Feature extraction parameters - Optimized for speed
+    MAX_FEATURES = 5000  # Reduced from 10000 for faster training
+    MIN_DF = 5  # Increased to reduce feature space
+    MAX_DF = 0.9  # Slightly more restrictive
+    NGRAM_RANGE = (1, 2)  # Reduced from (1,3) to (1,2) for speed
     
     # Model thresholds
     CLASSIFICATION_THRESHOLD = 0.5

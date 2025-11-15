@@ -10,6 +10,16 @@ from pathlib import Path
 import json
 import time
 from datetime import datetime
+import sys
+
+# Try to import tqdm for progress bars, fallback if not available
+try:
+    from tqdm import tqdm
+    HAS_TQDM = True
+except ImportError:
+    HAS_TQDM = False
+    def tqdm(iterable, *args, **kwargs):
+        return iterable
 
 # Absolute imports
 from detection_system.config import Config
@@ -35,12 +45,46 @@ class DetectionPipeline:
             train_df = pd.read_csv(self.config.TRAIN_DATA)
             test_df = pd.read_csv(self.config.TEST_DATA)
             
-            print(f"Train set: {len(train_df)} samples")
-            print(f"Test set: {len(test_df)} samples")
+            print(f"Original train set: {len(train_df)} samples")
+            print(f"Original test set: {len(test_df)} samples")
+            
+            # Option to sample large datasets for faster training
+            ENABLE_SAMPLING = False   # Enable for faster training, disable for max accuracy
+            MAX_TRAIN_SAMPLES = 1000  # Increased for good accuracy but faster training
+            MAX_TEST_SAMPLES = 200   # Increased for reliable evaluation
+            
+            if ENABLE_SAMPLING:
+                if len(train_df) > MAX_TRAIN_SAMPLES:
+                    print(f"⚡ Sampling train set: {len(train_df)} → {MAX_TRAIN_SAMPLES}")
+                    train_df = train_df.sample(n=MAX_TRAIN_SAMPLES, random_state=42)
+                    
+                if len(test_df) > MAX_TEST_SAMPLES:
+                    print(f"⚡ Sampling test set: {len(test_df)} → {MAX_TEST_SAMPLES}")
+                    test_df = test_df.sample(n=MAX_TEST_SAMPLES, random_state=42)
+            else:
+                print(f"🚀 Using full datasets for maximum performance")
+            
+            # Clean data - remove rows with missing prompts or invalid data
+            train_df = train_df.dropna(subset=['prompt', 'label'])
+            test_df = test_df.dropna(subset=['prompt', 'label'])
+            
+            # Remove non-string prompts
+            train_df = train_df[train_df['prompt'].apply(lambda x: isinstance(x, str))]
+            test_df = test_df[test_df['prompt'].apply(lambda x: isinstance(x, str))]
+            
+            print(f"Final train set: {len(train_df)} samples")
+            print(f"Final test set: {len(test_df)} samples")
             
             # Convert labels to binary
-            train_labels = (train_df['label'] == 'malicious').astype(int)
-            test_labels = (test_df['label'] == 'malicious').astype(int)
+            if train_df['label'].dtype == 'object':
+                train_labels = (train_df['label'] == 'malicious').astype(int)
+            else:
+                train_labels = train_df['label'].astype(int)
+                
+            if test_df['label'].dtype == 'object':
+                test_labels = (test_df['label'] == 'malicious').astype(int)
+            else:
+                test_labels = test_df['label'].astype(int)
             
             return {
                 'train_texts': train_df['prompt'].tolist(),
@@ -104,11 +148,12 @@ class DetectionPipeline:
     
     def train_and_evaluate_ml(self, data, train_features, test_features):
         """
-        Train và evaluate ML models
+        Train và evaluate ML models với progress tracking
         """
         print("\n=== ML-BASED DETECTION ===")
         
         # Prepare features
+        print("🔧 Preparing features...")
         X_train = self.ml_detector.prepare_features(
             train_features['statistical_features'],
             train_features['tfidf_features']
@@ -122,16 +167,56 @@ class DetectionPipeline:
         y_train = np.array(data['train_labels'])
         y_test = np.array(data['test_labels'])
         
-        # Train all models
-        print(f"Training features shape: {X_train.shape}")
-        training_results = self.ml_detector.train_all_models(X_train, y_train)
+        # Train all models với progress tracking
+        print(f"🚀 Training features shape: {X_train.shape}")
+        print(f"📊 Training on {len(y_train):,} samples")
         
-        # Evaluate all models
+        # Get list of models to train
+        models_to_train = list(self.ml_detector.models.keys())
+        print(f"🎯 Training {len(models_to_train)} models: {', '.join(models_to_train)}")
+        
+        training_results = {}
+        
+        # Single-line progress bar for all models  
+        print("\n🚀 Training Models:")
+        
+        # Train each model with single-line progress
+        for i, model_name in enumerate(models_to_train, 1):
+            start_time = time.time()
+            
+            # Visual progress bar callback
+            def progress_callback(stage, progress=None):
+                if progress is not None:
+                    # Create visual progress bar
+                    bar_length = 30
+                    filled_length = int(bar_length * progress // 100)
+                    bar = '█' * filled_length + '░' * (bar_length - filled_length)
+                    # Update same line with \r
+                    print(f"\r📈 [{i}/{len(models_to_train)}] {model_name}: [{bar}] {progress:.0f}% {stage}", end="", flush=True)
+                    
+            # Train single model
+            trained_model = self.ml_detector.train_single_model(
+                model_name, X_train, y_train, progress_callback=progress_callback
+            )
+            
+            # Get model results from trained_models dict
+            result = self.ml_detector.trained_models[model_name]
+            training_results[model_name] = result
+            
+            elapsed = time.time() - start_time
+            
+            # Final result on same line with proper clearing
+            bar = '█' * 30  # Full progress bar
+            print(f"\r📈 [{i}/{len(models_to_train)}] {model_name}: [{bar}] 100% ✅ Done ({elapsed:.1f}s) - F1: {result['cv_mean']:.4f}")
+            
+        print()  # New line after all models
+        
+        print("\n🔍 Evaluating all models...")
         evaluation_results = self.ml_detector.evaluate_all_models(X_test, y_test)
         
         # Find best model
         best_model, best_score = self.ml_detector.get_best_model(evaluation_results)
-        print(f"\nBest model: {best_model} (F1 Score: {best_score:.4f})")
+        print(f"\n🏆 Best model: {best_model} (F1 Score: {best_score:.4f})")
         
         return evaluation_results, best_model
     
