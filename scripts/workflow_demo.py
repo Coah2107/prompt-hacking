@@ -18,17 +18,17 @@ from prevention_system.validators.response_validators.safety_validator import Re
 
 class WorkflowDemonstrator:
     def __init__(self):
-        print("🚀 INITIALIZING PROMPT HACKING DETECTION & PREVENTION SYSTEM")
+        print("HUGGINGFACE INITIALIZING PROMPT HACKING DETECTION & PREVENTION SYSTEM")
         print("=" * 70)
         
         # Initialize all components
-        print("📝 Loading components...")
+        print("INPUT Loading components...")
         self.rule_detector = RuleBasedDetector()
         self.input_filter = InputFilter()  
         self.semantic_filter = SemanticFilter()
         self.response_validator = ResponseValidator()
         
-        print("✅ All components loaded successfully!")
+        print("SUCCESS All components loaded successfully!")
         
         # Predefined AI responses cho demo
         self.ai_responses = {
@@ -44,9 +44,9 @@ class WorkflowDemonstrator:
     
     def process_single_prompt(self, user_input, scenario_name="Test"):
         """Process a single prompt through complete workflow"""
-        print(f"\n🎯 SCENARIO: {scenario_name}")
-        print(f"📝 User Input: \"{user_input}\"")
-        print(f"⏰ Processing Time: {datetime.now().strftime('%H:%M:%S')}")
+        print(f"\nTARGET SCENARIO: {scenario_name}")
+        print(f"INPUT User Input: \"{user_input}\"")
+        print(f"Processing Time: {datetime.now().strftime('%H:%M:%S')}")
         
         workflow_log = {
             'input': user_input,
@@ -65,9 +65,9 @@ class WorkflowDemonstrator:
         confidence = detection_result['confidence']
         detections = detection_result.get('detections', [])
         
-        print(f"🔍 Detection Result: {prediction.upper()}")
-        print(f"🎯 Confidence: {confidence:.2f}")
-        print(f"⚡ Processing Time: {detection_time:.2f}ms")
+        print(f"PERFORMANCE Detection Result: {prediction.upper()}")
+        print(f"TARGET Confidence: {confidence:.2f}")
+        print(f"Processing Time: {detection_time:.2f}ms")
         
         if detections:
             print("📋 Triggered Rules:")
@@ -94,10 +94,10 @@ class WorkflowDemonstrator:
         risk_level = filter_result['risk_level']
         reasons = filter_result.get('reasons', [])
         
-        status = "🟢 ALLOWED" if allowed else "🔴 BLOCKED"
-        print(f"🛡️  Filter Decision: {status}")
-        print(f"⚠️  Risk Level: {risk_level}")
-        print(f"⚡ Processing Time: {filter_time:.2f}ms")
+        status = "ALLOWED" if allowed else "BLOCKED"
+        print(f"Filter Decision: {status}")
+        print(f"WARNING  Risk Level: {risk_level}")
+        print(f"Processing Time: {filter_time:.2f}ms")
         
         if reasons:
             print("📋 Reasons:")
@@ -157,10 +157,10 @@ class WorkflowDemonstrator:
         attack_similarity = semantic_result.get('attack_similarity', 0)
         intent = semantic_result.get('intent', 'unknown')
         
-        print(f"🧠 Toxicity Score: {toxicity:.3f}")
-        print(f"⚔️  Attack Similarity: {attack_similarity:.3f}")
-        print(f"🎯 Detected Intent: {intent}")
-        print(f"⚡ Processing Time: {semantic_time:.2f}ms")
+        print(f"Toxicity Score: {toxicity:.3f}")
+        print(f"Attack Similarity: {attack_similarity:.3f}")
+        print(f"TARGET Detected Intent: {intent}")
+        print(f"Processing Time: {semantic_time:.2f}ms")
         
         workflow_log['stages']['semantic_analysis'] = {
             'toxicity_score': toxicity,
@@ -180,13 +180,13 @@ class WorkflowDemonstrator:
         safety_score = validation_result['safety_score']
         issues = validation_result.get('issues', [])
         
-        safety_status = "🟢 SAFE" if is_safe else "🔴 UNSAFE"
-        print(f"✅ Safety Status: {safety_status}")
-        print(f"🛡️  Safety Score: {safety_score:.3f}")
-        print(f"⚡ Processing Time: {validation_time:.2f}ms")
+        safety_status = "SAFE" if is_safe else "UNSAFE"
+        print(f"SUCCESS Safety Status: {safety_status}")
+        print(f"Safety Score: {safety_score:.3f}")
+        print(f"Processing Time: {validation_time:.2f}ms")
         
         if issues:
-            print("⚠️  Issues Found:")
+            print("WARNING  Issues Found:")
             for issue in issues[:2]:
                 print(f"  • {issue}")
         
@@ -200,13 +200,13 @@ class WorkflowDemonstrator:
         # Final Decision
         print(f"\n{'=' * 70}")
         if allowed and is_safe:
-            final_decision = "🟢 RESPONSE DELIVERED TO USER"
+            final_decision = "RESPONSE DELIVERED TO USER"
             workflow_log['final_decision'] = 'delivered'
         else:
-            final_decision = "🔴 RESPONSE BLOCKED OR MODIFIED"
+            final_decision = "RESPONSE BLOCKED OR MODIFIED"
             workflow_log['final_decision'] = 'blocked_or_modified'
         
-        print(f"🏁 FINAL DECISION: {final_decision}")
+        print(f"FINAL DECISION: {final_decision}")
         
         # Calculate total processing time
         total_time = sum([
@@ -258,9 +258,9 @@ class WorkflowDemonstrator:
         results = []
         
         for i, scenario in enumerate(scenarios, 1):
-            print(f"\n📊 DEMONSTRATION {i}/{len(scenarios)}")
-            print(f"📋 Scenario: {scenario['name']}")
-            print(f"📝 Description: {scenario['description']}")
+            print(f"\nANALYSIS DEMONSTRATION {i}/{len(scenarios)}")
+            print(f"Scenario: {scenario['name']}")
+            print(f"INPUT Description: {scenario['description']}")
             
             result = self.process_single_prompt(scenario['input'], scenario['name'])
             results.append(result)
@@ -269,34 +269,34 @@ class WorkflowDemonstrator:
             time.sleep(0.5)
         
         # Summary
-        print(f"\n📈 DEMONSTRATION SUMMARY")
+        print(f"\nREPORT DEMONSTRATION SUMMARY")
         print("=" * 70)
         
         delivered = sum(1 for r in results if r['final_decision'] == 'delivered')
         blocked = len(results) - delivered
         avg_time = sum(r.get('total_processing_time_ms', 0) for r in results) / len(results)
         
-        print(f"📊 Total Scenarios: {len(results)}")
-        print(f"✅ Responses Delivered: {delivered}")
-        print(f"🔴 Requests Blocked: {blocked}")
-        print(f"⚡ Average Processing Time: {avg_time:.2f}ms")
-        print(f"🎯 Block Rate: {blocked/len(results)*100:.1f}%")
+        print(f"ANALYSIS Total Scenarios: {len(results)}")
+        print(f"SUCCESS Responses Delivered: {delivered}")
+        print(f"Requests Blocked: {blocked}")
+        print(f"Average Processing Time: {avg_time:.2f}ms")
+        print(f"TARGET Block Rate: {blocked/len(results)*100:.1f}%")
         
         return results
     
     def interactive_mode(self):
         """Interactive mode for custom input testing"""
-        print(f"\n🎮 INTERACTIVE MODE")
+        print(f"\nINTERACTIVE MODE")
         print("=" * 70)
-        print("💡 Enter prompts to test through the complete workflow")
-        print("💡 Type 'exit' to quit, 'demo' to run demos")
+        print("Key Enter prompts to test through the complete workflow")
+        print("Key Type 'exit' to quit, 'demo' to run demos")
         
         while True:
             try:
-                user_input = input("\n🎯 Enter prompt: ").strip()
+                user_input = input("\nTARGET Enter prompt: ").strip()
                 
                 if user_input.lower() == 'exit':
-                    print("👋 Goodbye!")
+                    print("Goodbye!")
                     break
                 elif user_input.lower() == 'demo':
                     self.run_demo_scenarios()
@@ -307,19 +307,19 @@ class WorkflowDemonstrator:
                 self.process_single_prompt(user_input, "Interactive Test")
                 
             except KeyboardInterrupt:
-                print("\n👋 Exiting interactive mode...")
+                print("\nExiting interactive mode...")
                 break
             except Exception as e:
-                print(f"\n❌ Error: {e}")
+                print(f"\nERROR Error: {e}")
 
 def main():
     """Main demo function"""
     demo = WorkflowDemonstrator()
     
-    print(f"\n🎯 WORKFLOW DEMO OPTIONS:")
-    print("1️⃣  Run predefined demonstration scenarios")
-    print("2️⃣  Enter interactive mode for custom testing") 
-    print("3️⃣  Run both")
+    print(f"\nTARGET WORKFLOW DEMO OPTIONS:")
+    print("Run predefined demonstration scenarios")
+    print("Enter interactive mode for custom testing") 
+    print("Run both")
     
     try:
         choice = input("\nSelect option (1/2/3): ").strip()
@@ -336,9 +336,9 @@ def main():
             demo.run_demo_scenarios()
             
     except KeyboardInterrupt:
-        print("\n👋 Demo interrupted by user")
+        print("\nDemo interrupted by user")
     except Exception as e:
-        print(f"\n❌ Demo error: {e}")
+        print(f"\nERROR Demo error: {e}")
 
 if __name__ == "__main__":
     main()

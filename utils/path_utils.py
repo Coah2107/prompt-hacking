@@ -99,7 +99,7 @@ ensure_directory_exists(PREVENTION_METRICS_DIR)
 
 if __name__ == "__main__":
     # Test the path utilities
-    print("🧪 Testing Project Path Utilities")
+    print("Test Testing Project Path Utilities")
     print("=" * 50)
     
     print(f"Project Root: {PROJECT_ROOT}")
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     print(f"\n📁 Testing relative paths:")
     for path_parts in test_paths:
         full_path = get_relative_path(*path_parts)
-        exists = "✅" if os.path.exists(full_path) else "❌"
+        exists = "SUCCESS" if os.path.exists(full_path) else "ERROR"
         print(f"  {exists} {'/'.join(path_parts)} -> {full_path}")
     
-    print("\n✅ Path utilities test completed!")
+    print("\nSUCCESS Path utilities test completed!")

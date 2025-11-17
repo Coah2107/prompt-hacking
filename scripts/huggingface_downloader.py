@@ -34,15 +34,15 @@ class HuggingFaceDatasetDownloader:
                 split_name = list(dataset.keys())[0]
                 self.raw_data = dataset[split_name]
                 
-            print(f"✅ Dataset downloaded successfully!")
-            print(f"📊 Total samples: {len(self.raw_data)}")
+            print(f"SUCCESS Dataset downloaded successfully!")
+            print(f"ANALYSIS Total samples: {len(self.raw_data)}")
             
             # Show column names
             if hasattr(self.raw_data, 'column_names'):
                 print(f"📋 Columns: {self.raw_data.column_names}")
             
             # Show first few examples
-            print(f"\n🔍 First 3 examples:")
+            print(f"\nPERFORMANCE First 3 examples:")
             for i in range(min(3, len(self.raw_data))):
                 example = self.raw_data[i]
                 print(f"  {i+1}. {example}")
@@ -50,16 +50,16 @@ class HuggingFaceDatasetDownloader:
             return True
             
         except Exception as e:
-            print(f"❌ Error downloading dataset: {str(e)}")
+            print(f"ERROR Error downloading dataset: {str(e)}")
             return False
     
     def explore_dataset_structure(self):
         """Khám phá cấu trúc của dataset"""
         if self.raw_data is None:
-            print("❌ No data to explore. Download dataset first.")
+            print("ERROR No data to explore. Download dataset first.")
             return
             
-        print(f"\n🔍 EXPLORING DATASET STRUCTURE")
+        print(f"\nPERFORMANCE EXPLORING DATASET STRUCTURE")
         print("=" * 50)
         
         # Basic info
@@ -69,7 +69,7 @@ class HuggingFaceDatasetDownloader:
         # Convert to pandas for easier analysis
         df = self.raw_data.to_pandas()
         
-        print(f"\n📊 COLUMN ANALYSIS:")
+        print(f"\nANALYSIS COLUMN ANALYSIS:")
         for col in df.columns:
             print(f"\n{col}:")
             if df[col].dtype == 'object':
@@ -126,7 +126,7 @@ class HuggingFaceDatasetDownloader:
         print(f"Detected label column: {label_col}")
         
         if text_col is None:
-            print("⚠️  Could not detect text column. Using first text-like column.")
+            print("WARNING  Could not detect text column. Using first text-like column.")
             text_col = columns[0]
             
         # Process each sample
@@ -164,11 +164,11 @@ class HuggingFaceDatasetDownloader:
                 processed_samples.append(sample)
                 
             except Exception as e:
-                print(f"⚠️  Error processing sample {idx}: {str(e)}")
+                print(f"WARNING  Error processing sample {idx}: {str(e)}")
                 continue
         
         self.processed_data = processed_samples
-        print(f"✅ Processed {len(processed_samples)} samples")
+        print(f"SUCCESS Processed {len(processed_samples)} samples")
         
         return processed_samples
     
@@ -259,7 +259,7 @@ class HuggingFaceDatasetDownloader:
     def save_processed_dataset(self, processed_data, prefix="huggingface"):
         """Lưu processed dataset"""
         if not processed_data:
-            print("❌ No processed data to save")
+            print("ERROR No processed data to save")
             return
             
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -268,7 +268,7 @@ class HuggingFaceDatasetDownloader:
         df = pd.DataFrame(processed_data)
         
         # Statistics
-        print(f"\n📊 PROCESSED DATASET STATISTICS:")
+        print(f"\nANALYSIS PROCESSED DATASET STATISTICS:")
         print(f"Total samples: {len(df)}")
         print(f"Label distribution:")
         print(df['label'].value_counts())
@@ -329,7 +329,7 @@ class HuggingFaceDatasetDownloader:
     
     def run_complete_pipeline(self):
         """Chạy toàn bộ pipeline download và xử lý"""
-        print("🚀 HUGGINGFACE DATASET DOWNLOAD PIPELINE")
+        print("HUGGINGFACE HUGGINGFACE DATASET DOWNLOAD PIPELINE")
         print("=" * 60)
         
         # Step 1: Download
@@ -349,8 +349,8 @@ class HuggingFaceDatasetDownloader:
         # Step 4: Save processed dataset
         paths = self.save_processed_dataset(processed_data)
         
-        print(f"\n✅ Pipeline completed successfully!")
-        print(f"🎯 Dataset from HuggingFace is now ready for testing your models")
+        print(f"\nSUCCESS Pipeline completed successfully!")
+        print(f"TARGET Dataset from HuggingFace is now ready for testing your models")
         
         return True
 
@@ -360,7 +360,7 @@ def main():
     success = downloader.run_complete_pipeline()
     
     if success:
-        print(f"\n📈 NEXT STEPS:")
+        print(f"\nREPORT NEXT STEPS:")
         print("  1. Check the datasets/ folder for new files")
         print("  2. Run: python3 dataset_benchmark.py (to compare with other datasets)")
         print("  3. Test your models on this new dataset")

@@ -16,3 +16,6 @@ venv/
 !model_comparison.csv
 !detection_results.json
 .github/
+TASKS.md
+detection_system/saved_models/deep_learning/model.pth
+detection_system/saved_models/deep_learning/tokenizer/

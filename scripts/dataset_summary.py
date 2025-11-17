@@ -237,7 +237,7 @@ def summarize_results():
             print(f"     • {insight}")
     
     # Performance analysis dựa trên dữ liệu hiện tại
-    print(f"\n🔍 PERFORMANCE ANALYSIS:")
+    print(f"\nPERFORMANCE PERFORMANCE ANALYSIS:")
     print("-" * 75)
     
     print(f"\n💚 BEST PERFORMING APPROACHES:")
@@ -261,7 +261,7 @@ def summarize_results():
         gap = challenge_score - hf_score
         print(f"  • {model}: {gap:.3f} drop")
     
-    print(f"\n⚠️  KEY FINDINGS:")
+    print(f"\nWARNING  KEY FINDINGS:")
     current_challenging = current_datasets.get('challenging', {})
     current_hf = current_datasets.get('huggingface', {})
     
@@ -274,12 +274,12 @@ def summarize_results():
     print("  5. Hybrid approach (rules + ML) recommended for production")
     
     print(f"\nTARGET RECOMMENDATIONS:")
-    print("  ✅ Use Rule-based detection as primary defense (high accuracy)")
-    print("  ✅ Use Challenging dataset for ML model development")
-    print("  ✅ Use HuggingFace dataset for final validation & benchmarking")
-    print("  ✅ Implement hybrid approach (rules + ML) for best coverage")
-    print("  ✅ Focus on Logistic Regression for production ML component")
-    print("  ✅ Consider ensemble methods for edge cases")
+    print("  SUCCESS Use Rule-based detection as primary defense (high accuracy)")
+    print("  SUCCESS Use Challenging dataset for ML model development")
+    print("  SUCCESS Use HuggingFace dataset for final validation & benchmarking")
+    print("  SUCCESS Implement hybrid approach (rules + ML) for best coverage")
+    print("  SUCCESS Focus on Logistic Regression for production ML component")
+    print("  SUCCESS Consider ensemble methods for edge cases")
     
     # Current dataset files summary
     print(f"\nFile CURRENT DATASET FILES:")
@@ -319,7 +319,7 @@ def summarize_results():
     print("-" * 80)
     
     rule_based = "TARGET Primary"
-    ml_support = "🔧 Support"
+    ml_support = "FIX Support"
     hybrid = "� Best"
     
     print(f"{'Rule-based Detection':<25} {'0.850-1.000':<10} {'Known Patterns':<15} {rule_based}")
@@ -327,10 +327,10 @@ def summarize_results():
     print(f"{'Hybrid (Rules + ML)':<25} {'0.900+':<10} {'Comprehensive':<15} {hybrid}")
     
     print(f"\nTARGET CURRENT SYSTEM STATUS:")
-    print("  ✅ Rule-based detection: Implemented and operational")
-    print("  ✅ ML models: Trained and ready (3 models available)")
-    print("  ✅ Datasets: Available for validation and improvement")
-    print("  ✅ Performance: Excellent on known patterns, good on novel attacks")
+    print("  SUCCESS Rule-based detection: Implemented and operational")
+    print("  SUCCESS ML models: Trained and ready (3 models available)")
+    print("  SUCCESS Datasets: Available for validation and improvement")
+    print("  SUCCESS Performance: Excellent on known patterns, good on novel attacks")
     
     # Save summary report
     save_summary_report(current_datasets, performance_estimates)
@@ -361,16 +361,16 @@ def save_summary_report(current_datasets, performance_estimates):
         print(f"\n💾 Summary report saved: {filepath}")
         
     except Exception as e:
-        print(f"\n❌ Failed to save summary report: {e}")
+        print(f"\nERROR Failed to save summary report: {e}")
 
 def main():
     """Main function để chạy dataset summary"""
     try:
         summarize_results()
-        print(f"\n✅ Dataset summary completed successfully!")
+        print(f"\nSUCCESS Dataset summary completed successfully!")
         
     except Exception as e:
-        print(f"\n❌ Error in dataset summary: {e}")
+        print(f"\nERROR Error in dataset summary: {e}")
         raise
 
 if __name__ == "__main__":

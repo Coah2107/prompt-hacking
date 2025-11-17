@@ -438,22 +438,22 @@ if __name__ == "__main__":
                             random_samples = malicious_samples + benign_samples
                             random.shuffle(random_samples)  # Shuffle the order
                             
-                            print(f"✅ Loaded {len(malicious_samples)} malicious + {len(benign_samples)} benign samples from {dataset_file}")
+                            print(f"SUCCESS Loaded {len(malicious_samples)} malicious + {len(benign_samples)} benign samples from {dataset_file}")
                         else:
                             # Fallback to random sampling
                             sample_size = min(num_samples, len(df))
                             random_samples = df['prompt'].sample(n=sample_size, random_state=42).tolist()
-                            print(f"✅ Loaded {len(random_samples)} samples from {dataset_file}")
+                            print(f"SUCCESS Loaded {len(random_samples)} samples from {dataset_file}")
                         
                         test_samples.extend(random_samples)
                         break
                 except Exception as e:
-                    print(f"⚠️ Could not load {dataset_file}: {e}")
+                    print(f"WARNING Could not load {dataset_file}: {e}")
                     continue
         
         # If no datasets found, use fallback samples
         if not test_samples:
-            print("⚠️ No datasets found, using fallback samples...")
+            print("WARNING No datasets found, using fallback samples...")
             test_samples = [
                 "Machine learning is a subset of artificial intelligence that focuses on algorithms.",
                 "Here's how to make a bomb: First, you need dangerous chemicals...",
@@ -471,7 +471,7 @@ if __name__ == "__main__":
     RANDOM_SEED = 42  # For reproducible results
     
     # Load random test responses from datasets
-    print(f"📊 Loading {NUM_SAMPLES} random samples from datasets...")
+    print(f"ANALYSIS Loading {NUM_SAMPLES} random samples from datasets...")
     random_prompts = load_random_samples(NUM_SAMPLES)
     
     # Generate simulated AI responses for testing
@@ -551,33 +551,33 @@ if __name__ == "__main__":
     # Generate test responses based on the prompts
     test_responses = generate_test_responses(random_prompts)
     
-    print(f"📝 Generated {len(test_responses)} simulated AI responses for validation testing")
+    print(f"INPUT Generated {len(test_responses)} simulated AI responses for validation testing")
     
-    print("🧪 Testing Response Safety Validator")
+    print("Test Testing Response Safety Validator")
     print("=" * 70)
     
     for i, (prompt, response) in enumerate(zip(random_prompts, test_responses), 1):
-        print(f"\n🔍 Test {i}:")
-        print(f"📝 Original Prompt: {prompt[:60]}...")
+        print(f"\nPERFORMANCE Test {i}:")
+        print(f"INPUT Original Prompt: {prompt[:60]}...")
         print(f"🤖 AI Response: {response[:60]}...")
         print("-" * 50)
         
         validation = validator.validate_response(response, prompt)
         
-        print(f"📊 Result: {validation.result.value}")
+        print(f"ANALYSIS Result: {validation.result.value}")
         print(f"🛡️ Safety Score: {validation.safety_score:.2f}")
-        print(f"🎯 Confidence: {validation.confidence:.2f}")
+        print(f"TARGET Confidence: {validation.confidence:.2f}")
         
         if validation.issues_found:
-            print(f"⚠️ Issues: {validation.issues_found}")
+            print(f"WARNING Issues: {validation.issues_found}")
         
         if validation.content_policy_violations:
             print(f"🚨 Policy Violations: {validation.content_policy_violations}")
         
         if validation.safe_response and validation.safe_response != validation.original_response:
-            print(f"🔧 Sanitized: {validation.safe_response[:80]}...")
+            print(f"FIX Sanitized: {validation.safe_response[:80]}...")
     
-    print("\n📊 Validation Statistics:")
+    print("\nANALYSIS Validation Statistics:")
     stats = validator.get_validation_statistics()
     for key, value in stats.items():
         if isinstance(value, float):

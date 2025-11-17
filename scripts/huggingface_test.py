@@ -78,7 +78,7 @@ class HuggingFaceModelTester:
     
     def test_on_huggingface_dataset(self, df, dataset_name="HuggingFace"):
         """Test models trên HuggingFace dataset"""
-        print(f"\n🧪 Testing on {dataset_name} Dataset")
+        print(f"\nTest Testing on {dataset_name} Dataset")
         print("-" * 60)
         
         # Prepare data

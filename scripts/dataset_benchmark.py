@@ -38,7 +38,7 @@ class DatasetBenchmark:
         
     def load_dataset(self, dataset_path, dataset_name):
         """Load and prepare dataset"""
-        print(f"\n📊 Loading {dataset_name}...")
+        print(f"\nANALYSIS Loading {dataset_name}...")
         
         df = pd.read_csv(dataset_path)
         
@@ -51,7 +51,7 @@ class DatasetBenchmark:
         
         cleaned_size = len(df)
         if cleaned_size != original_size:
-            print(f"   ⚠️  Cleaned: {original_size} → {cleaned_size} samples (removed {original_size - cleaned_size} invalid)")
+            print(f"   WARNING  Cleaned: {original_size} → {cleaned_size} samples (removed {original_size - cleaned_size} invalid)")
         
         # Sample large datasets for efficiency
         if len(df) > 10000:
@@ -143,7 +143,7 @@ class DatasetBenchmark:
         }
         
         # Print summary
-        print(f"\n   📈 Results for {dataset_name}:")
+        print(f"\n   REPORT Results for {dataset_name}:")
         for model_name, metrics in evaluation_results.items():
             print(f"     {model_name}: F1={metrics['f1_score']:.4f}, "
                   f"Precision={metrics['precision']:.4f}, "
@@ -211,7 +211,7 @@ class DatasetBenchmark:
     
     def run_comprehensive_benchmark(self):
         """Run benchmark on multiple datasets"""
-        print("🚀 COMPREHENSIVE DATASET BENCHMARK")
+        print("HUGGINGFACE COMPREHENSIVE DATASET BENCHMARK")
         print("=" * 70)
         
         datasets_to_test = []
@@ -232,11 +232,11 @@ class DatasetBenchmark:
             datasets_to_test.append(('HuggingFace Dataset', str(latest_huggingface)))
         
         if not datasets_to_test:
-            print("❌ No datasets found in datasets/ directory")
-            print("💡 Please ensure you have challenging_dataset_*.csv or huggingface_dataset_*.csv files")
+            print("ERROR No datasets found in datasets/ directory")
+            print("Key Please ensure you have challenging_dataset_*.csv or huggingface_dataset_*.csv files")
             return {}
         
-        print(f"📊 Found {len(datasets_to_test)} datasets to benchmark:")
+        print(f"ANALYSIS Found {len(datasets_to_test)} datasets to benchmark:")
         for name, path in datasets_to_test:
             print(f"   • {name}: {Path(path).name}")
         
@@ -246,29 +246,29 @@ class DatasetBenchmark:
                 texts, labels, df_full = self.load_dataset(dataset_path, dataset_name)
                 self.evaluate_on_dataset(texts, labels, dataset_name.lower().replace(' ', '_'), df_full)
             except Exception as e:
-                print(f"❌ Error evaluating {dataset_name}: {str(e)}")
+                print(f"ERROR Error evaluating {dataset_name}: {str(e)}")
                 continue
         
         # Generate comparison report
         if self.results:
             self.generate_comparison_report()
         else:
-            print("❌ No successful evaluations completed")
+            print("ERROR No successful evaluations completed")
         
         return self.results
     
     def generate_comparison_report(self):
         """Generate detailed comparison report"""
         print(f"\n" + "=" * 60)
-        print("📊 COMPREHENSIVE BENCHMARK RESULTS")
+        print("ANALYSIS COMPREHENSIVE BENCHMARK RESULTS")
         print("=" * 60)
         
         if len(self.results) < 2:
-            print("⚠️  Need at least 2 datasets to compare")
+            print("WARNING  Need at least 2 datasets to compare")
             return
         
         # Compare F1 scores across datasets
-        print(f"\n🎯 F1 SCORE COMPARISON:")
+        print(f"\nTARGET F1 SCORE COMPARISON:")
         
         # Get all model names
         all_models = set()
@@ -351,7 +351,7 @@ class DatasetBenchmark:
                 json.dump(report_data, f, indent=2, default=str, ensure_ascii=False)
             
         except Exception as e:
-            print(f"\n❌ Failed to save benchmark report: {e}")
+            print(f"\nERROR Failed to save benchmark report: {e}")
     
     def _find_best_model(self):
         """Find best performing model across datasets"""
@@ -413,8 +413,8 @@ def main():
     benchmark = DatasetBenchmark()
     results = benchmark.run_comprehensive_benchmark()
     
-    print(f"\n✅ Benchmark completed!")
-    print(f"📈 Check results/ folder for detailed analysis")
+    print(f"\nSUCCESS Benchmark completed!")
+    print(f"REPORT Check results/ folder for detailed analysis")
     
     return results
 
