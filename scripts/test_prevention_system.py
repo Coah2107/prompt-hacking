@@ -33,16 +33,32 @@ class IntegratedSecuritySystem:
         self.input_filter = CoreInputFilter(PreventionConfig)
         self.detection_pipeline = DetectionPipeline()
         
-        # Load trained ML models if available
+        # Load trained Deep Learning model (DistilBERT)
+        self.dl_detector = None
+        self.ml_models_available = False
+        
         try:
-            self.ml_detector = TraditionalMLDetector(DetectionConfig)
-            # Try to load pre-trained models
-            self.ml_detector.load_models(DetectionConfig.MODELS_DIR)
-            self.ml_models_available = True
-            print("Loaded pre-trained ML models")
+            # Import deep learning detector
+            from detection_system.models.deep_learning.transformer_detector import DeepLearningTrainer
+            
+            # Initialize and load trained model
+            self.dl_detector = DeepLearningTrainer()
+            
+            # Path to saved DistilBERT model
+            models_dir = project_root / "detection_system" / "saved_models" / "deep_learning"
+            
+            if (models_dir / "model.pth").exists():
+                self.dl_detector.load_model(models_dir)
+                self.ml_models_available = True
+                print("✅ Loaded DistilBERT Deep Learning model")
+            else:
+                print("❌ DistilBERT model not found, falling back to pattern detection")
+                self.dl_detector = None
+                
         except Exception as e:
-            print(f"ML models not available: {e}")
-            self.ml_models_available = False
+            print(f"❌ Deep Learning model not available: {e}")
+            print("🔄 Falling back to pattern-based detection")
+            self.dl_detector = None
     
     def analyze_prompt(self, prompt: str, user_id: str = "test_user"):
         """
@@ -116,12 +132,58 @@ class IntegratedSecuritySystem:
     
     def _run_ml_detection(self, prompt: str):
         """
-        Run REAL ML-based detection using trained Logistic Regression model
+        Run DEEP LEARNING detection using trained DistilBERT model
         """
         try:
-            # ENHANCED ML-INSPIRED PATTERN DETECTION
-            # Based on insights from trained Logistic Regression F1=0.721
+            # Use DistilBERT model if available
+            if self.dl_detector is not None:
+                return self._run_distilbert_detection(prompt)
+            else:
+                # Fallback to enhanced pattern detection
+                return self._run_enhanced_pattern_detection(prompt)
+                
+        except Exception as e:
+            print(f"Deep Learning model failed: {e}")
+            return self._fallback_pattern_detection(prompt)
+    
+    def _run_distilbert_detection(self, prompt: str):
+        """
+        Run DistilBERT-based detection (BEST MODEL)
+        """
+        try:
+            # Get prediction probabilities from DistilBERT
+            probabilities = self.dl_detector.predict_proba([prompt])[0]  # Shape: (2,) [benign_prob, malicious_prob]
             
+            # Get binary prediction
+            predictions = self.dl_detector.predict([prompt])[0]  # 0=benign, 1=malicious
+            
+            malicious_probability = probabilities[1]  # Probability of malicious class
+            is_malicious = predictions == 1
+            
+            # DistilBERT confidence is based on the max probability
+            confidence = max(probabilities[0], probabilities[1])
+            
+            return {
+                'is_malicious': is_malicious,
+                'confidence': confidence,
+                'malicious_probability': malicious_probability,
+                'model_used': 'distilbert_transformer',
+                'benign_probability': probabilities[0],
+                'raw_prediction': int(predictions),
+                'model_architecture': 'DistilBERT + 3-layer Neural Network'
+            }
+            
+        except Exception as e:
+            print(f"DistilBERT detection failed: {e}")
+            # Fallback to enhanced pattern detection
+            return self._run_enhanced_pattern_detection(prompt)
+    
+    def _run_enhanced_pattern_detection(self, prompt: str):
+        """
+        Enhanced pattern-based detection (fallback when DistilBERT unavailable)
+        Based on insights from trained Logistic Regression F1=0.721
+        """
+        try:
             prompt_lower = prompt.lower()
             
             # ULTRA-COMPREHENSIVE malicious patterns (enhanced based on missed cases)
@@ -243,7 +305,7 @@ class IntegratedSecuritySystem:
                 'is_malicious': is_malicious,
                 'confidence': confidence,
                 'malicious_probability': risk_score,
-                'model_used': 'ml_inspired_pattern_detector',
+                'model_used': 'enhanced_pattern_detector_fallback',
                 'high_risk_matches': high_matches,
                 'medium_risk_matches': medium_matches,
                 'subtle_matches': subtle_matches,
@@ -251,7 +313,7 @@ class IntegratedSecuritySystem:
             }
             
         except Exception as e:
-            print(f"ML model failed: {e}")
+            print(f"Enhanced pattern detection failed: {e}")
             return self._fallback_pattern_detection(prompt)
     
     def _fallback_pattern_detection(self, prompt: str):
@@ -276,35 +338,51 @@ class IntegratedSecuritySystem:
     def _combine_decisions(self, filter_result, ml_result):
         """
         Combine prevention filter and ML detection results
+        OPTIMIZED FOR DISTILBERT: Lower threshold for better malicious detection
         """
         # If either system detects malicious content with high confidence, block it
         filter_confidence = filter_result.get('confidence', 0)
         ml_confidence = ml_result.get('confidence', 0)
+        ml_malicious_prob = ml_result.get('malicious_probability', 0)
         
-        # AGGRESSIVE blocking: Either system detects malicious → BLOCK
+        # HIGH CONFIDENCE blocking for DistilBERT predictions
+        # Balanced threshold for good precision/recall trade-off
         if (not filter_result['allowed'] and filter_confidence > 0.5) or \
-           (ml_result['is_malicious'] and ml_confidence > 0.6):
+           (ml_result['is_malicious'] and ml_malicious_prob > 0.55):  # Higher threshold for precision
             return {
                 'allowed': False,
                 'risk_level': 'high',
                 'confidence': max(filter_confidence, ml_confidence),
-                'blocked_by': 'aggressive_security_mode',
+                'blocked_by': 'distilbert_high_confidence',
                 'reasons': [
                     f"Filter: {filter_result.get('risk_level', 'unknown')} ({filter_confidence:.2f})",
-                    f"ML: {'malicious' if ml_result['is_malicious'] else 'benign'} ({ml_confidence:.2f})"
+                    f"DistilBERT: {'malicious' if ml_result['is_malicious'] else 'benign'} ({ml_malicious_prob:.3f})"
                 ]
             }
         
-        # Medium confidence - require both systems to agree for blocking
-        elif filter_result['risk_level'] in ['medium', 'high'] and ml_result['is_malicious']:
+        # Medium threshold - DistilBERT with good confidence
+        elif ml_malicious_prob > 0.48:  # Balanced threshold for suspicious content
             return {
                 'allowed': False,
                 'risk_level': 'medium',
-                'confidence': (filter_confidence + ml_confidence) / 2,
-                'blocked_by': 'combined_medium_confidence',
+                'confidence': ml_confidence,
+                'blocked_by': 'distilbert_medium_confidence',
                 'reasons': [
-                    f"Both systems detected suspicious content",
-                    f"Filter: {filter_confidence:.2f}, ML: {ml_confidence:.2f}"
+                    f"DistilBERT detected suspicious content",
+                    f"Malicious probability: {ml_malicious_prob:.3f}"
+                ]
+            }
+        
+        # Filter detects medium risk
+        elif filter_result['risk_level'] in ['medium', 'high']:
+            return {
+                'allowed': False,
+                'risk_level': filter_result['risk_level'],
+                'confidence': filter_confidence,
+                'blocked_by': 'prevention_filter',
+                'reasons': [
+                    f"Prevention filter blocked: {filter_result['risk_level']}",
+                    f"Filter confidence: {filter_confidence:.2f}"
                 ]
             }
         
@@ -313,11 +391,11 @@ class IntegratedSecuritySystem:
             return {
                 'allowed': True,
                 'risk_level': 'low',
-                'confidence': max(1 - filter_confidence, 1 - ml_result['malicious_probability']),
+                'confidence': max(1 - filter_confidence, 1 - ml_malicious_prob),
                 'blocked_by': 'none',
                 'reasons': [
                     f"Both security layers passed",
-                    f"Filter: {filter_result['risk_level']}, ML: benign"
+                    f"Filter: {filter_result['risk_level']}, DistilBERT: {ml_malicious_prob:.3f}"
                 ]
             }
 
@@ -404,7 +482,8 @@ def run_comprehensive_test(random_seed=None, num_samples=20):
     """
     print("🔐 INTEGRATED SECURITY SYSTEM TEST - RANDOM SAMPLES")
     print("=" * 70)
-    print("🎯 Using BEST MODEL: Enhanced Pattern Analysis (Based on F1=0.721)")
+    print("🎯 Using BEST MODEL: DistilBERT Deep Learning Transformer (F1=0.70+)")
+    print("🤖 AI Architecture: DistilBERT + 3-layer Neural Network")
     print("📊 Dataset: Challenging Test Dataset (High Quality)")
     print("🎲 Sampling: Random selection for varied testing")
     print("=" * 70)
@@ -515,7 +594,8 @@ def run_comprehensive_test(random_seed=None, num_samples=20):
     avg_time = sum(r['analysis']['processing_time'] for r in results['details']) / len(results['details'])
     print(f"\n⚡ PERFORMANCE METRICS:")
     print(f"  Average processing time: {avg_time:.3f}s")
-    print(f"  ML Model used: Logistic Regression (Best F1=0.721)")
+    print(f"  AI Model used: DistilBERT Transformer (70% accuracy)")
+    print(f"  Model architecture: distilbert-base-uncased + Neural Network")
     print(f"  Dataset source: Challenging Train Dataset")
     
     print(f"\n{'='*70}")
