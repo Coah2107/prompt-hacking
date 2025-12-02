@@ -555,6 +555,50 @@ def run_comprehensive_test(random_seed=None, num_samples=20):
         
         print(f"Status: {status}")
         
+        # DETAILED FAILURE ANALYSIS - Chi tiết lý do fail
+        if not test_passed:
+            print(f"\n🔍 FAILURE ANALYSIS:")
+            print(f"   Expected: {expected}")
+            print(f"   Actual: {'ALLOWED' if allowed else 'BLOCKED'}")
+            print(f"   Label: {test_case['actual_label']}")
+            
+            # Analyze why it failed
+            if test_case['actual_label'] == 'malicious' and allowed:
+                print(f"   ❌ FALSE NEGATIVE: Malicious content was allowed through")
+                print(f"   🎯 Root cause: DistilBERT confidence too low")
+                if analysis['ml_detection']:
+                    ml_prob = analysis['ml_detection']['malicious_probability']
+                    print(f"   📊 DistilBERT malicious probability: {ml_prob:.3f} (threshold: 0.48)")
+                    if ml_prob < 0.48:
+                        print(f"   ⚠️  Below detection threshold by {0.48 - ml_prob:.3f}")
+                    print(f"   🔧 Suggestion: Consider lowering threshold to {ml_prob - 0.05:.3f}")
+                print(f"   🚨 Security Risk: HIGH - Malicious content could harm users")
+                
+            elif test_case['actual_label'] == 'benign' and not allowed:
+                print(f"   ❌ FALSE POSITIVE: Benign content was blocked")
+                print(f"   🎯 Root cause: System too aggressive")
+                if analysis['ml_detection']:
+                    ml_prob = analysis['ml_detection']['malicious_probability']
+                    print(f"   📊 DistilBERT malicious probability: {ml_prob:.3f}")
+                    print(f"   ⚠️  Blocked by: {analysis['final_decision']['blocked_by']}")
+                print(f"   🔧 Suggestion: Increase threshold or adjust filter patterns")
+                print(f"   😞 User Experience: Legitimate user frustrated")
+                
+            # Show decision path
+            print(f"   🛤️  Decision path:")
+            print(f"      Prevention Filter: {analysis['prevention_filter']['risk_level']} (conf: {analysis['prevention_filter']['confidence']:.2f})")
+            if analysis['ml_detection']:
+                print(f"      DistilBERT: {'Malicious' if analysis['ml_detection']['is_malicious'] else 'Benign'} (prob: {analysis['ml_detection']['malicious_probability']:.3f})")
+            print(f"      Final Decision: {analysis['final_decision']['blocked_by']}")
+            
+            # Show reasons for decision
+            if 'reasons' in analysis['final_decision']:
+                print(f"   📝 Decision reasons:")
+                for reason in analysis['final_decision']['reasons']:
+                    print(f"      • {reason}")
+                    
+            print("")  # Extra spacing for failed tests
+        
         # Store detailed results
         results['details'].append({
             'test_case': test_case,
@@ -580,6 +624,72 @@ def run_comprehensive_test(random_seed=None, num_samples=20):
     print(f"\n📊 PERFORMANCE BREAKDOWN:")
     print(f"🔴 Malicious Detection: {malicious_passed}/{len(malicious_tests)} ({malicious_passed/len(malicious_tests)*100:.1f}%)")
     print(f"🟢 Benign Allow Rate: {benign_passed}/{len(benign_tests)} ({benign_passed/len(benign_tests)*100:.1f}%)")
+    
+    # DETAILED FAILURE SUMMARY - Tổng hợp lý do fail
+    if results['failed'] > 0:
+        print(f"\n🔍 FAILURE SUMMARY - PHÂN TÍCH CHI TIẾT CÁC CASE FAIL:")
+        print("=" * 60)
+        
+        failed_tests = [r for r in results['details'] if not r['passed']]
+        false_negatives = []  # Malicious được classify nhầm thành benign
+        false_positives = []  # Benign được classify nhầm thành malicious
+        
+        for fail in failed_tests:
+            test_case = fail['test_case']
+            analysis = fail['analysis']
+            
+            if test_case['actual_label'] == 'malicious' and analysis['final_decision']['allowed']:
+                false_negatives.append({
+                    'test': test_case,
+                    'ml_prob': analysis['ml_detection']['malicious_probability'] if analysis['ml_detection'] else 0,
+                    'category': test_case['category'],
+                    'difficulty': test_case.get('difficulty', 'unknown')
+                })
+            elif test_case['actual_label'] == 'benign' and not analysis['final_decision']['allowed']:
+                false_positives.append({
+                    'test': test_case,
+                    'ml_prob': analysis['ml_detection']['malicious_probability'] if analysis['ml_detection'] else 0,
+                    'category': test_case['category'],
+                    'difficulty': test_case.get('difficulty', 'unknown')
+                })
+        
+        if false_negatives:
+            print(f"🚨 FALSE NEGATIVES ({len(false_negatives)}): Malicious bị bỏ sót")
+            for i, fn in enumerate(false_negatives, 1):
+                print(f"   {i}. Category: {fn['category']}")
+                print(f"      Difficulty: {fn['difficulty']}")
+                print(f"      DistilBERT probability: {fn['ml_prob']:.3f} (< threshold 0.48)")
+                print(f"      Gap to threshold: {0.48 - fn['ml_prob']:.3f}")
+                print(f"      Prompt: {fn['test']['prompt'][:60]}...")
+                print()
+            
+            # Calculate threshold adjustment suggestion
+            max_fn_prob = max(fn['ml_prob'] for fn in false_negatives)
+            suggested_threshold = max_fn_prob - 0.02
+            print(f"   💡 THRESHOLD TUNING SUGGESTION:")
+            print(f"      Current threshold: 0.48")
+            print(f"      Suggested threshold: {suggested_threshold:.3f}")
+            print(f"      This would catch {len(false_negatives)} more malicious cases")
+            print(f"      ⚠️  Risk: Might increase false positives")
+        
+        if false_positives:
+            print(f"😞 FALSE POSITIVES ({len(false_positives)}): Benign bị block nhầm")
+            for i, fp in enumerate(false_positives, 1):
+                print(f"   {i}. Category: {fp['category']}")
+                print(f"      DistilBERT probability: {fp['ml_prob']:.3f}")
+                print(f"      Blocked by: System too aggressive")
+                print(f"      Prompt: {fp['test']['prompt'][:60]}...")
+                print()
+        
+        print(f"🎯 PATTERN ANALYSIS:")
+        if false_negatives:
+            fn_categories = [fn['category'] for fn in false_negatives]
+            fn_difficulties = [fn['difficulty'] for fn in false_negatives]
+            print(f"   Most missed categories: {', '.join(set(fn_categories))}")
+            print(f"   Most missed difficulties: {', '.join(set(fn_difficulties))}")
+            print(f"   Average missed probability: {sum(fn['ml_prob'] for fn in false_negatives)/len(false_negatives):.3f}")
+        
+        print("=" * 60)
     
     # System statistics
     print(f"\nPREVENTION FILTER STATISTICS:")
