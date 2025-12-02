@@ -33,6 +33,43 @@ class PreventionConfig:
         'malicious_threshold': 0.9    # Threshold for immediate blocking
     }
     
+    # Prompt Leaking Detection Config (NEW)
+    PROMPT_LEAKING_CONFIG = {
+        'enabled': True,
+        'detection_threshold': 0.5,     # Confidence threshold for detection
+        'critical_threshold': 0.9,      # Threshold for critical/immediate block
+        'high_risk_threshold': 0.75,    # Threshold for high risk
+        'medium_risk_threshold': 0.5,   # Threshold for medium risk
+        
+        # Actions per risk level
+        'actions': {
+            'critical': 'block',        # Block immediately
+            'high': 'block',            # Block
+            'medium': 'flag',           # Allow but flag for review
+            'low': 'log',               # Log only
+            'none': 'allow'             # Allow
+        },
+        
+        # Leaking technique weights (for combined scoring)
+        'technique_weights': {
+            'direct_extraction': 1.0,
+            'developer_impersonation': 1.0,
+            'debug_mode': 0.95,
+            'roleplay_extraction': 0.9,
+            'encoding_tricks': 0.85,
+            'context_manipulation': 0.85,
+            'indirect_extraction': 0.8,
+            'gradual_extraction': 0.75,
+        },
+        
+        # Blocked response for leaking attempts
+        'blocked_response': "I cannot reveal my system prompt or internal instructions.",
+        
+        # Logging
+        'log_attempts': True,
+        'alert_on_critical': True,
+    }
+    
     # Output validation config
     OUTPUT_VALIDATION_CONFIG = {
         'max_response_length': 5000,
