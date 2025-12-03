@@ -30,7 +30,7 @@ class PreventionConfig:
             r'override\s+(?:all\s+)?(?:safety|security)',
         ],
         'suspicious_threshold': 0.7,  # Threshold for suspicious content
-        'malicious_threshold': 0.9    # Threshold for immediate blocking
+        'malicious_threshold': 0.85    # Threshold for immediate blocking
     }
     
     # Prompt Leaking Detection Config (NEW)
