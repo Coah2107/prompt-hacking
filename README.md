@@ -3,21 +3,23 @@
 > **Advanced AI Security system for detecting and preventing prompt hacking attacks**
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.0+-orange.svg)
-![HuggingFace](/img.shields.io/badge/🤗%20HuggingFace-datasets-yellow.svg)
+![HuggingFace](https://img.shields.io/badge/🤗%20HuggingFace-Transformers-yellow.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-production%20ready-brightgreen.svg)
 
 ## 📋 Project Overview
 
-A system to detect and prevent prompt hacking attacks in AI security, using a combination of **Rule-based Detection** and **Machine Learning** with high performance on real data.
+A system to detect and prevent prompt hacking attacks in AI security, using a combination of **Rule-based Detection**, **Machine Learning**, and **Deep Learning (Transformers)** with high performance on real data.
 
 ### 🎯 **Key Features**
-- ✅ **Multi-Algorithm Detection**: 5 ML models + Rule-based patterns
+- ✅ **Multi-Algorithm Detection**: 6 ML models + DistilBERT + Rule-based patterns
+- ✅ **Deep Learning**: DistilBERT Transformer with GPU acceleration (CUDA)
 - ✅ **Production-Ready**: Tested on 373K+ real-world samples  
-- ✅ **High Performance**: F1=0.721 on large-scale HuggingFace dataset
+- ✅ **High Performance**: F1=0.649 (DistilBERT) - Best performing model
 - ✅ **Comprehensive Evaluation**: Multiple datasets from synthetic to production
-- ✅ **Feature Engineering**: 10,000+ text features with TF-IDF and statistical patterns
+- ✅ **Feature Engineering**: 5,000+ text features with TF-IDF and statistical patterns
 
 ## 🏗️ Project Structure
 
@@ -35,10 +37,13 @@ prompt-hacking/
 │   ├── models/                    # Detection algorithms
 │   │   ├── rule_based/           # Pattern-based detection
 │   │   │   └── pattern_detector.py
-│   │   └── ml_based/             # Machine learning models
-│   │       └── traditional_ml.py  # 5 ML algorithms
+│   │   ├── ml_based/             # Machine learning models
+│   │   │   └── traditional_ml.py  # 6 ML algorithms
+│   │   └── deep_learning/        # Deep learning models
+│   │       └── transformer_detector.py  # DistilBERT
 │   ├── evaluation/               # Performance evaluation
 │   └── saved_models/            # Trained model files
+│       └── deep_learning/       # DistilBERT weights
 ├── 📈 results/                   # Evaluation results & reports
 ├── 📚 docs/                     # Technical documentation  
 └── 🧪 scripts/                 # Testing & benchmark scripts
@@ -131,36 +136,40 @@ python scripts/dataset_summary.py
 
 ## 📊 Performance Metrics
 
-### 🎯 **Production Performance** (HuggingFace Dataset - 373K samples)
+### 🎯 **Unified Benchmark** (HuggingFace Test Dataset - 74,730 samples)
 
-| Model | F1 Score | Precision | Recall | AUC |
-|-------|----------|-----------|--------|-----|
-| **Logistic Regression** | **0.721** | 0.722 | 0.721 | 0.790 |
-| Random Forest | 0.709 | 0.709 | 0.709 | 0.794 |
-| Gradient Boosting | 0.706 | 0.713 | 0.708 | 0.781 |
-| SVM | 0.671 | 0.675 | 0.672 | 0.752 |
-| Rule-based | 0.817 | 1.000 | 0.690 | - |
+| Rank | Model | Type | F1 Score | Accuracy | Precision | Recall |
+|------|-------|------|----------|----------|-----------|--------|
+| 🥇 1 | **DistilBERT** | DL | **0.6491** | 0.7821 | 0.5217 | 0.8588 |
+| 2 | SVM (Fast) | ML | 0.4522 | 0.5456 | 0.3153 | 0.7990 |
+| 3 | Naive Bayes | ML | 0.4289 | 0.6311 | 0.3368 | 0.5902 |
+| 4 | Random Forest | ML | 0.3826 | 0.2574 | 0.2377 | 0.9806 |
+| 5 | SVM | ML | 0.3620 | 0.6886 | 0.3487 | 0.3764 |
+| 6 | Logistic Regression | ML | 0.2340 | 0.7459 | 0.3999 | 0.1653 |
+| 7 | Gradient Boosting | ML | 0.1329 | 0.7733 | 0.6482 | 0.0741 |
 
-### 🧪 **Development Performance** (Challenging Dataset - 199 samples)
+### 🧠 **Deep Learning Model Details**
 
-| Model | F1 Score | Precision | Recall |
-|-------|----------|-----------|--------|
-| **Random Forest** | **0.925** | 0.927 | 0.925 |
-| **Gradient Boosting** | **0.925** | 0.927 | 0.925 |
-| Logistic Regression | 0.898 | 0.902 | 0.900 |
-| SVM | 0.828 | 0.856 | 0.825 |
+| Component | Configuration |
+|-----------|---------------|
+| **Base Model** | DistilBERT (distilbert-base-uncased) |
+| **Parameters** | 66M total, 14M trainable (21.7%) |
+| **Optimization** | Mixed Precision (AMP), Layer Freezing |
+| **Training** | 3 epochs, batch_size=32, lr=3e-5 |
+| **Hardware** | NVIDIA RTX 2060 (6GB VRAM) |
 
 ### 📈 **Performance Analysis**
 ```
-🎯 Deployment Strategy:
-Development → Challenging Dataset (F1=0.925) - Fast iteration
-Production → HuggingFace Dataset (F1=0.721) - Real-world validation
+🏆 Best Model: DistilBERT (Deep Learning)
+   F1-Score:  0.6491 (+43% vs best ML model)
+   Accuracy:  78.21%
+   Recall:    85.88% (catches most attacks)
 
 🔍 Key Insights:
-• Performance gap: 0.204 (Development → Production)
-• Logistic Regression: Best production performance
-• Random Forest: Most consistent across datasets  
-• Rule-based: High precision (1.0) but lower recall (0.69)
+• Deep Learning significantly outperforms traditional ML
+• DistilBERT achieves highest recall (85.88%) - critical for security
+• ML models struggle with complex attack patterns
+• Layer freezing reduces training time by 3-4x
 ```
 
 ## 🛠️ Development & Testing
@@ -204,10 +213,17 @@ python detection_system/models/ml_based/traditional_ml.py
 - **Low Severity**: System prompt manipulation, instruction bypassing
 
 ### ML-Based Features
-- **Statistical Features**: Text length, punctuation density, special characters
-- **Pattern Features**: Suspicious keyword detection, command patterns
-- **TF-IDF Features**: 10,000 n-gram features (1-3 grams)
-- **Total Features**: ~10,017 features per prompt
+- **Statistical Features**: Text length, punctuation density, special characters (9 features)
+- **Pattern Features**: Suspicious keyword detection, command patterns (8 features)
+- **TF-IDF Features**: 5,000 n-gram features (1-3 grams)
+- **Total Features**: ~5,017 features per prompt
+
+### Deep Learning Features
+- **Model**: DistilBERT (66M parameters)
+- **Tokenization**: WordPiece with max_length=256
+- **Optimization**: Mixed Precision Training (AMP)
+- **Layer Freezing**: 4/6 transformer layers frozen
+- **GPU Acceleration**: CUDA with cuDNN benchmark
 
 ### Supported Attack Types
 ```
@@ -270,11 +286,18 @@ python detection_system/models/ml_based/traditional_ml.py
 - Real-time attack prevention (94% success rate)
 - Production-ready API với monitoring
 
-### 🔄 **Phase 4: Advanced Features** (In Progress)
-- Deep learning models (BERT, RoBERTa)
+### ✅ **Phase 4: Deep Learning** (Completed)
+- DistilBERT transformer model implementation
+- GPU acceleration with CUDA support
+- Mixed Precision Training (AMP) optimization
+- Layer freezing for faster training
+- Best F1-Score: 0.6491 (+43% improvement)
+
+### 🔄 **Phase 5: Future Enhancements** (Planned)
 - Multi-language support
 - Active learning pipeline
 - Adversarial training
+- Model ensemble strategies
 
 ## 🤝 Contributing
 
@@ -295,6 +318,14 @@ We welcome contributions! Please follow these steps:
 
 ## 📊 Recent Updates
 
+### v3.0.0 - Deep Learning Integration (December 2025)
+- ✅ **DistilBERT** transformer model for prompt detection
+- ✅ **GPU acceleration** with CUDA support (RTX 2060)
+- ✅ **Mixed Precision Training** (AMP) - 2-3x speedup
+- ✅ **Layer Freezing** optimization - 21.7% trainable params
+- ✅ **Best Performance**: F1=0.6491 (+43% vs ML models)
+- ✅ Unified benchmark on 74,730 test samples
+
 ### v2.1.0 - Production Ready
 - ✅ Large-scale HuggingFace dataset integration (373K samples)
 - ✅ Multi-dataset performance benchmarking
@@ -302,8 +333,8 @@ We welcome contributions! Please follow these steps:
 - ✅ Production-ready performance: F1=0.721
 
 ### v2.0.0 - Advanced Detection
-- ✅ 5 ML algorithms implementation
-- ✅ Advanced feature engineering (10K+ features)
+- ✅ 6 ML algorithms implementation
+- ✅ Advanced feature engineering (5K+ features)
 - ✅ Comprehensive evaluation framework
 - ✅ Rule-based + ML hybrid approach
 

@@ -1,8 +1,8 @@
 # Prompt Hacking Detection & Prevention System Workflow
 
-## Tong quan Workflow
+## Tổng quan Workflow
 
-He thong hoat dong theo mo hinh **4-Stage Optimized Security Pipeline**:
+Hệ thống hoạt động theo mô hình **4-Stage Optimized Security Pipeline**:
 
 ```
 User Input --> [Stage 1: Fast Pre-filter] --> [Stage 2: Semantic Analysis] --> [Stage 3: AI Processing] --> [Stage 4: Response Validation] --> User Output
@@ -10,26 +10,67 @@ User Input --> [Stage 1: Fast Pre-filter] --> [Stage 2: Semantic Analysis] --> [
                    Block/Pass                    Block/Pass                                                     Block/Pass
 ```
 
-### So sanh Workflow Cu vs Moi:
+### So sánh Workflow Cũ vs Mới:
 
-| Workflow Cu (6 Stages) | Workflow Toi Uu (4 Stages) |
+| Workflow Cũ (6 Stages) | Workflow Tối Ưu (4 Stages) |
 |------------------------|---------------------------|
-| Rule Detection | (gop vao Stage 1) |
+| Rule Detection | (gộp vào Stage 1) |
 | Input Filtering | Stage 1: Fast Pre-filter |
-| Prompt Leaking | (gop vao Stage 1) |
+| Prompt Leaking | (gộp vào Stage 1) |
 | Semantic Analysis | Stage 2: Semantic Analysis |
 | AI Processing | Stage 3: AI Processing |
 | Response Validation | Stage 4: Response Validation |
 
-### Loi ich cua Workflow Toi Uu:
-- Giam tu 6 stages xuong 4 stages
-- Loai bo redundancy (trung lap pattern matching)
-- Fail-fast: Block attacks som voi chi phi thap
-- Semantic analysis TRUOC AI processing de tiet kiem cost
+### Lợi ích của Workflow Tối Ưu:
+- Giảm từ 6 stages xuống 4 stages
+- Loại bỏ redundancy (trùng lặp pattern matching)
+- Fail-fast: Block attacks sớm với chi phí thấp
+- Semantic analysis TRƯỚC AI processing để tiết kiệm cost
 
 ---
 
-## Chi tiet tung Stage:
+## 🏆 Detection System Benchmark Results
+
+### **Unified Benchmark** (HuggingFace Test Dataset - 74,730 samples)
+
+| Rank | Model | Type | F1 Score | Accuracy | Precision | Recall |
+|------|-------|------|----------|----------|-----------|--------|
+| 🥇 1 | **DistilBERT** | DL | **0.6491** | 0.7821 | 0.5217 | 0.8588 |
+| 2 | SVM (Fast) | ML | 0.4522 | 0.5456 | 0.3153 | 0.7990 |
+| 3 | Naive Bayes | ML | 0.4289 | 0.6311 | 0.3368 | 0.5902 |
+| 4 | Random Forest | ML | 0.3826 | 0.2574 | 0.2377 | 0.9806 |
+| 5 | SVM | ML | 0.3620 | 0.6886 | 0.3487 | 0.3764 |
+| 6 | Logistic Regression | ML | 0.2340 | 0.7459 | 0.3999 | 0.1653 |
+| 7 | Gradient Boosting | ML | 0.1329 | 0.7733 | 0.6482 | 0.0741 |
+
+### **Deep Learning Model Details**
+
+| Component | Configuration |
+|-----------|---------------|
+| **Base Model** | DistilBERT (distilbert-base-uncased) |
+| **Parameters** | 66M total, 14M trainable (21.7%) |
+| **Optimization** | Mixed Precision (AMP), Layer Freezing |
+| **Training** | 3 epochs, batch_size=32, lr=3e-5 |
+| **Hardware** | NVIDIA RTX 2060 (6GB VRAM) |
+| **Inference** | ~2.5 batch/s on GPU |
+
+### **Key Insights**
+```
+🏆 Best Model: DistilBERT (Deep Learning)
+   F1-Score:  0.6491 (+43% vs best ML model)
+   Accuracy:  78.21%
+   Recall:    85.88% (catches most attacks)
+
+🔍 Analysis:
+• Deep Learning significantly outperforms traditional ML
+• DistilBERT achieves highest recall - critical for security
+• Layer freezing reduces training time by 3-4x
+• GPU acceleration enables real-time detection
+```
+
+---
+
+## Chi tiết từng Stage:
 
 ### **Stage 1: Fast Pre-filter**
 
@@ -58,7 +99,7 @@ leaking_blocked = leaking_result.is_leaking_attempt
 stage1_blocked = pattern_blocked or leaking_blocked
 ```
 
-**Phat hien:**
+**Phát hiện:**
 - Direct injection: `ignore\s+(?:all\s+)?previous\s+instructions?`
 - Jailbreak: `act\s+as\s+dan`
 - Prompt leaking: 8 techniques (direct, indirect, roleplay, encoding, etc.)
@@ -71,7 +112,7 @@ stage1_blocked = pattern_blocked or leaking_blocked
 
 **File:** `prevention_system/filters/content_filters/semantic_filter.py`
 
-**Chuc nang:** Deep content analysis TRUOC AI processing
+**Chức năng:** Deep content analysis TRƯỚC AI processing
 
 **Process:**
 ```python
@@ -94,19 +135,19 @@ stage2_blocked = toxicity > 0.7 or attack_similarity > 0.8
 
 ### **Stage 3: AI Processing**
 
-**Chuc nang:** Generate response - expensive operation
+**Chức năng:** Generate response - expensive operation
 
-**Note:** Chi chay neu da pass Stage 1 va Stage 2
+**Note:** Chỉ chạy nếu đã pass Stage 1 và Stage 2
 
 ```python
-# Stage 3 chi chay sau khi:
+# Stage 3 chỉ chạy sau khi:
 # - Stage 1: pattern + leaking = PASSED
 # - Stage 2: semantic = PASSED
 
 response = ai_model.generate(user_input)
 ```
 
-**Performance:** 50-500ms (tuy model)
+**Performance:** 50-500ms (tùy model)
 
 ---
 
@@ -114,7 +155,7 @@ response = ai_model.generate(user_input)
 
 **File:** `prevention_system/validators/response_validators/safety_validator.py`
 
-**Chuc nang:** Final safety check truoc khi tra ve user
+**Chức năng:** Final safety check trước khi trả về user
 
 **Process:**
 ```python
@@ -183,14 +224,23 @@ Result: [BLOCKED] ~2ms total
 | Stage 3 | AI | 50-500ms | N/A |
 | Stage 4 | Validation | ~4ms | ~10% attacks |
 
-### **So sanh voi Workflow Cu:**
+### **Detection Model Benchmark (Standalone):**
 
-| Metric | 6-Stage | 4-Stage Optimized |
-|--------|---------|-------------------|
-| Total Stages | 6 | 4 |
-| Redundancy | Co (Rule + Filter) | Khong |
-| Avg Time (blocked) | ~10ms | ~2ms |
-| Avg Time (delivered) | ~115ms | ~60ms |
+| Model | F1 Score | Recall | Inference Time |
+|-------|----------|--------|----------------|
+| **DistilBERT** | **0.6491** | **0.8588** | ~10ms (GPU) |
+| SVM Fast | 0.4522 | 0.7990 | ~5ms (CPU) |
+| Naive Bayes | 0.4289 | 0.5902 | ~2ms (CPU) |
+| Random Forest | 0.3826 | 0.9806 | ~20ms (CPU) |
+
+### **Pipeline Metrics:**
+
+| Metric | Value |
+|--------|-------|
+| Total Stages | 4 |
+| Avg Time (blocked) | ~2ms |
+| Avg Time (delivered) | ~60ms |
+| Attack Block Rate | ~94% |
 
 ---
 
@@ -217,6 +267,30 @@ result = pipeline.process("Your prompt here")
 #     'blocked_at': None,
 #     'total_time_ms': 60.5
 # }
+```
+
+---
+
+## Model Evaluation:
+
+### **Run Detection Benchmark:**
+```bash
+# Evaluate all detection models on same test dataset (74,730 samples)
+python scripts/evaluate_models.py
+
+# Output:
+# 🖥️ Using device: cuda
+# 🎮 GPU: NVIDIA GeForce RTX 2060
+# 
+# ======================================================================
+# FINAL COMPARISON (sorted by F1-Score)
+# ======================================================================
+# Rank   Model                  Type        F1   Accuracy  Precision  Recall
+# --------------------------------------------------------------------------------
+# 1      distilbert             DL      0.6491     0.7821     0.5217  0.8588
+# 2      svm_fast               ML      0.4522     0.5456     0.3153  0.7990
+# 3      naive_bayes            ML      0.4289     0.6311     0.3368  0.5902
+# ...
 ```
 
 ---
@@ -271,6 +345,12 @@ python scripts/test_prompt_leaking.py
 
 # Run full prevention system test
 python scripts/test_prevention_system.py
+
+# Evaluate all detection models (ML + DL)
+python scripts/evaluate_models.py
+
+# Train DistilBERT model
+python scripts/deep_learning_trainer.py
 ```
 
-**4-Stage Optimized Pipeline da san sang production!**
+**4-Stage Optimized Pipeline đã sẵn sàng production!**

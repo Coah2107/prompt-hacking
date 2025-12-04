@@ -980,29 +980,46 @@ $$\text{Similarity} = \max(\text{Simple\_Score}, \text{Regex\_Score})$$
 
 ### 5.1 Kết quả Detection System
 
-**Nguồn:** `results/detection_results. json`
+**Nguồn:** `results/detection_results.json`
 
-#### Bảng so sánh các Model:
+#### 🏆 Unified Benchmark Results (HuggingFace Test Dataset - 74,730 samples)
 
-| Model | Precision | Recall | F1-Score | AUC |
-|-------|-----------|--------|----------|-----|
-| **Rule-based** | 0. 335 | 0. 029 | 0. 054 | - |
-| **Naive Bayes** | 0.759 | 0. 743 | 0. 750 | 0.745 |
-| **Random Forest** | 0.793 | 0. 633 | 0. 660 | 0. 802 |
-| **SVM** | 0.813 | 0. 749 | 0. 765 | - |
-| **Gradient Boosting** | 0.801 | 0. 809 | 0. 773 | 0. 819 |
-| **Logistic Regression** | **0.803** | **0. 817** | **0. 794** | **0. 836** |
+| Rank | Model | Type | F1 Score | Accuracy | Precision | Recall |
+|------|-------|------|----------|----------|-----------|--------|
+| 🥇 1 | **DistilBERT** | DL | **0.6491** | 0.7821 | 0.5217 | 0.8588 |
+| 2 | SVM (Fast) | ML | 0.4522 | 0.5456 | 0.3153 | 0.7990 |
+| 3 | Naive Bayes | ML | 0.4289 | 0.6311 | 0.3368 | 0.5902 |
+| 4 | Random Forest | ML | 0.3826 | 0.2574 | 0.2377 | 0.9806 |
+| 5 | SVM | ML | 0.3620 | 0.6886 | 0.3487 | 0.3764 |
+| 6 | Logistic Regression | ML | 0.2340 | 0.7459 | 0.3999 | 0.1653 |
+| 7 | Gradient Boosting | ML | 0.1329 | 0.7733 | 0.6482 | 0.0741 |
 
-> "Logistic Regression đạt kết quả tốt nhất với F1-Score = 0.794 và AUC = 0.836"
+> "**DistilBERT đạt kết quả tốt nhất** với F1-Score = 0.6491, vượt trội 43% so với model ML tốt nhất"
 
-#### Confusion Matrix (Logistic Regression):
+#### Deep Learning Model Details
+
+| Component | Configuration |
+|-----------|---------------|
+| **Base Model** | DistilBERT (distilbert-base-uncased) |
+| **Parameters** | 66M total, 14M trainable (21.7%) |
+| **Optimization** | Mixed Precision (AMP), Layer Freezing |
+| **Training** | 3 epochs, batch_size=32, lr=3e-5 |
+| **Hardware** | NVIDIA RTX 2060 (6GB VRAM) |
+| **Inference** | ~2.5 batch/s on GPU |
+
+#### Key Insights
 
 ```
-              Predicted
-           Benign  Malicious
-Actual 
-  Benign    54,573    2,618     (True Negative, False Positive)
-  Malicious 11,083    6,456     (False Negative, True Positive)
+🏆 Best Model: DistilBERT (Deep Learning)
+   F1-Score:  0.6491 (+43% vs best ML model)
+   Accuracy:  78.21%
+   Recall:    85.88% (catches most attacks)
+
+🔍 Analysis:
+• Deep Learning significantly outperforms traditional ML
+• DistilBERT achieves highest recall - critical for security
+• Layer freezing reduces training time by 3-4x
+• GPU acceleration enables real-time detection
 ```
 
 ### 5.2 Kết quả Prevention System
