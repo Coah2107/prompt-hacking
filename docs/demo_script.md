@@ -996,6 +996,29 @@ $$\text{Similarity} = \max(\text{Simple\_Score}, \text{Regex\_Score})$$
 
 > "**DistilBERT đạt kết quả tốt nhất** với F1-Score = 0.6491, vượt trội 43% so với model ML tốt nhất"
 
+#### Giải thích các chỉ số đánh giá (Metrics Explanation)
+
+| Metric | Ý nghĩa | Công thức | Quan trọng khi |
+|--------|---------|-----------|----------------|
+| **F1-Score** | Trung bình điều hòa của Precision và Recall. Đây là chỉ số **quan trọng nhất** vì cân bằng giữa việc phát hiện đúng và tránh cảnh báo giả | F1 = 2 × (P × R) / (P + R) | Dữ liệu mất cân bằng (imbalanced) |
+| **Accuracy** | Tỷ lệ dự đoán đúng trên tổng số mẫu. **Lưu ý:** Có thể gây hiểu nhầm với dữ liệu mất cân bằng | (TP + TN) / Total | Dữ liệu cân bằng |
+| **Precision** | Trong các mẫu được dự đoán là malicious, bao nhiêu % thực sự là malicious. **Cao = ít False Positive** (ít block nhầm người dùng hợp lệ) | TP / (TP + FP) | Chi phí False Positive cao |
+| **Recall** | Trong tất cả các mẫu malicious thực tế, model phát hiện được bao nhiêu %. **Cao = ít False Negative** (ít bỏ sót tấn công) | TP / (TP + FN) | Bảo mật quan trọng (không được bỏ sót) |
+
+> **Lưu ý về Dataset:** HuggingFace dataset có tỷ lệ mất cân bằng: 76.5% benign vs 23.5% malicious. Do đó:
+> - Accuracy cao không nhất thiết là model tốt (ví dụ: predict tất cả là benign sẽ có 76.5% accuracy)
+> - **F1-Score** là metric đáng tin cậy nhất trong trường hợp này
+> - **Recall** rất quan trọng cho hệ thống bảo mật (không được bỏ sót tấn công)
+
+#### Phân tích kết quả theo từng model
+
+| Model | Nhận xét |
+|-------|----------|
+| **DistilBERT** | F1 cao nhất (0.6491), Recall 85.88% nghĩa là chỉ bỏ sót ~14% tấn công. Precision 52.17% cho thấy có ~48% False Positive - chấp nhận được cho bảo mật |
+| **SVM Fast** | Recall tốt (79.9%) nhưng Precision thấp (31.53%) - block nhiều nhưng cũng block nhầm nhiều |
+| **Random Forest** | Recall cực cao (98.06%) nhưng Precision rất thấp (23.77%) - gần như block mọi thứ, không thực tế |
+| **Gradient Boosting** | Precision cao nhất (64.82%) nhưng Recall cực thấp (7.41%) - bỏ sót ~93% tấn công, không chấp nhận được |
+
 #### Deep Learning Model Details
 
 | Component | Configuration |

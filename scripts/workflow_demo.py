@@ -16,6 +16,7 @@ Run: python -m scripts.workflow_demo
 import time
 from datetime import datetime
 from typing import Dict, Any, Optional
+from pathlib import Path
 
 # Imports
 from prevention_system.filters.input_filters.core_filter import InputFilter
@@ -54,9 +55,14 @@ class OptimizedSecurityPipeline:
         print("Loading Stage 4: Response Validator...")
         self.response_validator = ResponseValidator()
         
+        # Stage 3 component: DistilBERT AI Detection
+        print("Loading Stage 3: DistilBERT Detector...")
+        self.dl_detector = None
+        self._load_distilbert()
+        
         print("\nPipeline Architecture:")
-        print("  [INPUT] -> Pre-filter -> Semantic -> AI -> Validation -> [OUTPUT]")
-        print("             (Block)      (Block)         (Block)")
+        print("  [INPUT] -> Pre-filter -> Semantic -> AI Detection -> Validation -> [OUTPUT]")
+        print("             (Block)      (Block)     (Block)         (Block)")
         print("=" * 70)
         
         # AI responses for demo
@@ -71,10 +77,26 @@ class OptimizedSecurityPipeline:
             'total_processed': 0,
             'blocked_prefilter': 0,
             'blocked_semantic': 0,
+            'blocked_ai_detection': 0,
             'blocked_validation': 0,
             'delivered': 0,
             'total_time_ms': 0
         }
+    
+    def _load_distilbert(self):
+        """Load DistilBERT model for Stage 3 AI Detection"""
+        try:
+            from detection_system.models.deep_learning.transformer_detector import DeepLearningTrainer
+            model_path = Path("detection_system/saved_models/deep_learning")
+            if model_path.exists() and (model_path / "model.pth").exists():
+                self.dl_detector = DeepLearningTrainer()
+                self.dl_detector.load_model(str(model_path))
+                print("  DistilBERT model loaded successfully")
+            else:
+                print("  WARNING: DistilBERT model not found, Stage 3 will use fallback")
+        except Exception as e:
+            print(f"  WARNING: Could not load DistilBERT: {e}")
+            self.dl_detector = None
     
     def display_stage(self, stage_num: int, stage_name: str, status: str = ""):
         """Display formatted stage header"""
@@ -195,16 +217,68 @@ class OptimizedSecurityPipeline:
             return result
         
         # ============================================================
-        # STAGE 3: AI PROCESSING (Simulated)
-        # Goal: Generate response - most expensive operation
+        # STAGE 3: AI DETECTION (DistilBERT Deep Learning)
+        # Goal: ML-based detection for sophisticated attacks
         # ============================================================
-        self.display_stage(3, "AI Processing")
+        self.display_stage(3, "AI Detection (DistilBERT)")
         stage3_start = time.time()
         
-        # Simulate AI processing delay
-        time.sleep(0.05)  # 50ms simulated delay
+        # Use DistilBERT for AI-based detection
+        stage3_blocked = False
+        dl_confidence = 0.0
+        dl_prediction = "benign"
         
-        # Select response type based on content
+        if self.dl_detector is not None:
+            try:
+                # Get prediction (0=benign, 1=malicious)
+                pred_labels = self.dl_detector.predict([user_input])
+                pred_proba = self.dl_detector.predict_proba([user_input])
+                
+                if len(pred_labels) > 0:
+                    pred_label = pred_labels[0]
+                    dl_prediction = "malicious" if pred_label == 1 else "benign"
+                    
+                    # Get confidence for predicted class
+                    if len(pred_proba) > 0:
+                        proba = pred_proba[0]
+                        dl_confidence = proba[pred_label] if len(proba) > 1 else proba[0]
+                    
+                    # Block if malicious with confidence > 0.5 (lowered threshold for security)
+                    if dl_prediction == "malicious" and dl_confidence > 0.5:
+                        stage3_blocked = True
+                        
+                print(f"  DistilBERT Prediction: {dl_prediction.upper()}")
+                print(f"  Confidence: {dl_confidence:.3f}")
+            except Exception as e:
+                print(f"  DistilBERT Error: {e}")
+                print(f"  Falling back to safe passage")
+        else:
+            print(f"  DistilBERT: Not loaded (fallback mode)")
+            print(f"  Confidence: N/A")
+        
+        stage3_time = (time.time() - stage3_start) * 1000
+        
+        print(f"  Decision: {'BLOCKED' if stage3_blocked else 'PASSED'}")
+        print(f"  Time: {stage3_time:.2f}ms")
+        
+        result['stages']['ai_detection'] = {
+            'blocked': stage3_blocked,
+            'prediction': dl_prediction,
+            'confidence': dl_confidence,
+            'model': 'DistilBERT' if self.dl_detector else 'None',
+            'time_ms': stage3_time
+        }
+        
+        if stage3_blocked:
+            self.stats['blocked_ai_detection'] += 1
+            result['final_decision'] = 'BLOCKED'
+            result['blocked_at'] = 'Stage 3: AI Detection'
+            result['block_reason'] = f'malicious_detected (conf: {dl_confidence:.2f})'
+            self._finalize_result(result, pipeline_start)
+            print(f"\n>>> BLOCKED at Stage 3: AI detected malicious content")
+            return result
+        
+        # Generate response for safe prompts
         if 'learn' in user_input.lower() or 'explain' in user_input.lower():
             response_type = 'educational'
         elif 'how' in user_input.lower() or 'implement' in user_input.lower():
@@ -213,17 +287,6 @@ class OptimizedSecurityPipeline:
             response_type = 'normal'
         
         ai_response = self.ai_responses[response_type]
-        stage3_time = (time.time() - stage3_start) * 1000
-        
-        print(f"  Response Type: {response_type}")
-        print(f"  Response Length: {len(ai_response)} chars")
-        print(f"  Time: {stage3_time:.2f}ms (simulated)")
-        
-        result['stages']['ai_processing'] = {
-            'response_type': response_type,
-            'response_length': len(ai_response),
-            'time_ms': stage3_time
-        }
         
         # ============================================================
         # STAGE 4: RESPONSE VALIDATION
@@ -297,6 +360,7 @@ class OptimizedSecurityPipeline:
         print(f"Delivered: {self.stats['delivered']} ({self.stats['delivered']/total*100:.1f}%)")
         print(f"Blocked at Pre-filter: {self.stats['blocked_prefilter']} ({self.stats['blocked_prefilter']/total*100:.1f}%)")
         print(f"Blocked at Semantic: {self.stats['blocked_semantic']} ({self.stats['blocked_semantic']/total*100:.1f}%)")
+        print(f"Blocked at AI Detection: {self.stats['blocked_ai_detection']} ({self.stats['blocked_ai_detection']/total*100:.1f}%)")
         print(f"Blocked at Validation: {self.stats['blocked_validation']} ({self.stats['blocked_validation']/total*100:.1f}%)")
         print(f"Average Time: {self.stats['total_time_ms']/total:.2f}ms")
     
