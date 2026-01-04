@@ -1,6 +1,6 @@
 """
 Core Input Filter - First line of defense
-Lý do: Prevent malicious prompts từ việc reach AI model, saving computational resources
+Reason: Prevent malicious prompts từ việc reach AI model, saving computational resources
 """
 
 import re
@@ -104,7 +104,7 @@ class CoreInputFilter:
     def _compile_patterns(self) -> List[re.Pattern]:
         """
         Compile regex patterns cho efficiency
-        Lý do: Pre-compiled patterns are much faster than compiling on each request
+        Reason: Pre-compiled patterns are much faster than compiling on each request
         """
         compiled_patterns = []
         for pattern in self.filter_config['blocked_patterns']:
@@ -118,7 +118,7 @@ class CoreInputFilter:
     def _check_basic_constraints(self, prompt: str) -> Tuple[bool, List[str]]:
         """
         Kiểm tra basic constraints (length, character limits, etc.)
-        Lý do: Quick filtering trước khi run expensive pattern matching
+        Reason: Quick filtering trước khi run expensive pattern matching
         """
         reasons = []
         
@@ -144,7 +144,7 @@ class CoreInputFilter:
     def _check_blocked_patterns(self, prompt: str) -> Tuple[List[str], float]:
         """
         Check for blocked patterns trong prompt
-        Lý do: Identify specific attack patterns và calculate risk score
+        Reason: Identify specific attack patterns và calculate risk score
         """
         matched_patterns = []
         confidence_scores = []
@@ -169,7 +169,7 @@ class CoreInputFilter:
                     for keyword in CONTEXT_EXCLUSION_KEYWORDS:
                         if keyword in prompt_lower:
                             should_exclude = True
-                            # Thêm lý do này để debug/theo dõi
+                            # Thêm Reason này để debug/theo dõi
                             print(f"[DEBUG] Excluding pattern '{current_pattern_str}' due to context keyword: '{keyword}'") 
                             break 
                             
@@ -193,7 +193,7 @@ class CoreInputFilter:
     def _sanitize_prompt(self, prompt: str) -> str:
         """
         Attempt to sanitize prompt thay vì block hoàn toàn
-        Lý do: Sometimes prompt có legitimate intent nhưng contains risky phrases
+        Reason: Sometimes prompt có legitimate intent nhưng contains risky phrases
         """
         sanitized = prompt
         
@@ -215,7 +215,7 @@ class CoreInputFilter:
     def _filter_prompt_full(self, prompt: str, user_id: str = None) -> FilterResponse:
         """
         Main filtering function (full version)
-        Lý do: Single entry point với comprehensive filtering logic
+        Reason: Single entry point với comprehensive filtering logic
         """
         start_time = time.time()
         self.statistics['total_processed'] += 1
@@ -318,7 +318,7 @@ class CoreInputFilter:
     def update_patterns(self, new_patterns: List[str]):
         """
         Update blocked patterns dynamically
-        Lý do: Adaptive defense - có thể add new attack patterns mà không cần restart system
+        Reason: Adaptive defense - có thể add new attack patterns mà không cần restart system
         """
         for pattern in new_patterns:
             try:
