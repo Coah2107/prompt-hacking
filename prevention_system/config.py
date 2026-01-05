@@ -1,6 +1,6 @@
 """
 Configuration for Prevention System
-Lý do: Centralized config cho tất cả prevention components với các thresholds và rules
+Reason: Centralized config cho tất cả prevention components với các thresholds và rules
 """
 
 from pathlib import Path

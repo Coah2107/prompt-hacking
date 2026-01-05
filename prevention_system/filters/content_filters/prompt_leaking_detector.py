@@ -4,7 +4,7 @@ Prompt Leaking Detector
 Author: Security Team
 Date: December 2024
 
-Lý do: Phát hiện các nỗ lực trích xuất/lấy cắp system prompt
+Reason: Phát hiện các nỗ lực trích xuất/lấy cắp system prompt
 Prompt Leaking là một loại tấn công nhằm tiết lộ system prompt của AI
 
 Các kỹ thuật Prompt Leaking:

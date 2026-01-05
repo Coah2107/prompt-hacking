@@ -1,6 +1,6 @@
 """
 Project Path Utilities
-Lý do: Centralized path management để tránh hardcoded paths và support multiple developers
+Reason: Centralized path management để tránh hardcoded paths và support multiple developers
 """
 
 import os

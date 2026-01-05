@@ -1,6 +1,6 @@
 """
 Traditional ML Models for Prompt Hacking Detection
-Lý do: Proven effective cho text classification, fast training và inference
+Reason: Proven effective cho text classification, fast training và inference
 """
 
 import pandas as pd
@@ -44,7 +44,7 @@ class TraditionalMLDetector:
     def _initialize_models(self):
         """
         Khởi tạo các ML models
-        Lý do: Different algorithms có strengths khác nhau cho text classification
+        Reason: Different algorithms có strengths khác nhau cho text classification
         """
         models = {
             'logistic_regression': {
@@ -120,7 +120,7 @@ class TraditionalMLDetector:
     def prepare_features(self, X_statistical, X_tfidf):
         """
         Chuẩn bị features cho training
-        Lý do: Combine statistical và TF-IDF features
+        Reason: Combine statistical và TF-IDF features
         """
         from scipy.sparse import hstack, csr_matrix
         
@@ -145,7 +145,7 @@ class TraditionalMLDetector:
     def train_single_model(self, model_name, X_train, y_train, X_val=None, y_val=None, progress_callback=None):
         """
         Train một model cụ thể với progress tracking
-        Lý do: Modular approach, có thể train từng model riêng biệt
+        Reason: Modular approach, có thể train từng model riêng biệt
         """
         import sys
         
@@ -229,7 +229,7 @@ class TraditionalMLDetector:
     def train_all_models(self, X_train, y_train, X_val=None, y_val=None):
         """
         Train tất cả models
-        Lý do: So sánh performance của different algorithms
+        Reason: So sánh performance của different algorithms
         """
         print("Starting training for all models...")
         

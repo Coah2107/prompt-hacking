@@ -1,6 +1,6 @@
 """
 Response Safety Validator - Validate AI responses trước khi return to user
-Lý do: Prevent harmful, inappropriate, or leaked information in AI responses
+Reason: Prevent harmful, inappropriate, or leaked information in AI responses
 """
 
 import re
@@ -50,7 +50,7 @@ class ResponseSafetyValidator:
     def _initialize_safety_patterns(self) -> Dict[str, List[str]]:
         """
         Initialize patterns để detect unsafe content in responses
-        Lý do: Comprehensive coverage của potential safety issues
+        Reason: Comprehensive coverage của potential safety issues
         """
         return {
             'personal_info_leakage': [
@@ -62,42 +62,42 @@ class ResponseSafetyValidator:
             ],
             
             'harmful_instructions': [
-                r'\bhow\s+to\s+(?:make|create|build)\s+(?:bomb|explosive|weapon)',
-                r'\bhow\s+to\s+(?:hack|break\s+into|crack)',
-                r'\bstep[s]?\s+to\s+(?:hurt|harm|kill)',
-                r'\binstructions?\s+for\s+(?:illegal|criminal)',
-                r'\brecipe\s+for\s+(?:poison|drug|explosive)'
+                r'\bhow\s+to\s+(?:make|create|build)\s+(?:bomb|explosive|weapon)',  # Huong dan che tao vu khi/chat no
+                r'\bhow\s+to\s+(?:hack|break\s+into|crack)',  # Huong dan hack/xam nhap he thong
+                r'\bstep[s]?\s+to\s+(?:hurt|harm|kill)',  # Cac buoc gay thuong tich/giet nguoi
+                r'\binstructions?\s+for\s+(?:illegal|criminal)',  # Huong dan hoat dong phi phap/toi pham
+                r'\brecipe\s+for\s+(?:poison|drug|explosive)'  # Cong thuc che tao chat doc/ma tuy/chat no
             ],
             
             'inappropriate_content': [
-                r'\b(?:explicit|graphic|sexual)\s+(?:content|material|description)',
-                r'\b(?:nude|naked|sex|porn)',
-                r'\b(?:violence|gore|blood|torture)\s+in\s+detail',
-                r'\bhateful?\s+(?:speech|content|language)',
-                r'\b(?:racist|sexist|homophobic|discriminatory)\b'
+                r'\b(?:explicit|graphic|sexual)\s+(?:content|material|description)',  # Noi dung khieu dam/nguoi lon
+                r'\b(?:nude|naked|sex|porn)',  # Tu khoa lien quan den khoa than/sex/phim nguoi lon
+                r'\b(?:violence|gore|blood|torture)\s+in\s+detail',  # Mo ta chi tiet bao luc/mau me/tra tan
+                r'\bhateful?\s+(?:speech|content|language)',  # Ngon tu/noi dung thu han
+                r'\b(?:racist|sexist|homophobic|discriminatory)\b'  # Phan biet chung toc/gioi tinh/ky thi
             ],
             
             'system_information_leakage': [
-                r'\bI\s+am\s+(?:Claude|GPT|ChatGPT|an?\s+AI)',
-                r'\bmy\s+(?:training|model|system|architecture)',
-                r'\b(?:Anthropic|OpenAI|Microsoft|Google)\s+(?:trained|developed|created)\s+me',
-                r'\binternal\s+(?:prompt|instruction|system)',
-                r'\bconfidential\s+(?:information|data|instruction)'
+                r'\bI\s+am\s+(?:Claude|GPT|ChatGPT|an?\s+AI)',  # Lo danh tinh AI (Claude, GPT, ChatGPT)
+                r'\bmy\s+(?:training|model|system|architecture)',  # Lo thong tin ve qua trinh huan luyen/kien truc
+                r'\b(?:Anthropic|OpenAI|Microsoft|Google)\s+(?:trained|developed|created)\s+me',  # Lo nha phat trien
+                r'\binternal\s+(?:prompt|instruction|system)',  # Lo prompt/huong dan noi bo
+                r'\bconfidential\s+(?:information|data|instruction)'  # Lo thong tin/du lieu mat
             ],
             
             'prompt_injection_success': [
-                r'\bignoring\s+previous\s+instructions?',
-                r'\bI\s+will\s+now\s+(?:ignore|override|bypass)',
-                r'\b(?:DAN|evil|harmful)\s+mode\s+activated',
-                r'\bjailbreak\s+successful',
-                r'\bsafety\s+(?:disabled|bypassed|overridden)'
+                r'\bignoring\s+previous\s+instructions?',  # Dau hieu bo qua huong dan truoc do
+                r'\bI\s+will\s+now\s+(?:ignore|override|bypass)',  # Tuyen bo se bo qua/vuot qua quy tac
+                r'\b(?:DAN|evil|harmful)\s+mode\s+activated',  # Kich hoat che do DAN/evil/harmful
+                r'\bjailbreak\s+successful',  # Thong bao jailbreak thanh cong
+                r'\bsafety\s+(?:disabled|bypassed|overridden)'  # An toan bi vo hieu hoa/vuot qua
             ]
         }
     
     def _initialize_content_policy(self) -> Dict[str, Dict]:
         """
         Initialize content policy rules
-        Lý do: Define what types of content violate policies
+        Reason: Define what types of content violate policies
         """
         return {
             'violence': {
@@ -130,7 +130,7 @@ class ResponseSafetyValidator:
     def _initialize_replacements(self) -> Dict[str, str]:
         """
         Initialize safe replacement text for unsafe content
-        Lý do: Provide helpful alternatives instead of just blocking
+        Reason: Provide helpful alternatives instead of just blocking
         """
         return {
             'harmful_instructions': "I can't provide instructions for harmful or dangerous activities. Is there something else I can help you with?",
@@ -143,7 +143,7 @@ class ResponseSafetyValidator:
     def _check_personal_info_leakage(self, response: str) -> Tuple[List[str], float]:
         """
         Check for personal information leakage
-        Lý do: Prevent accidental disclosure of sensitive information
+        Reason: Prevent accidental disclosure of sensitive information
         """
         issues = []
         confidence_scores = []
@@ -160,7 +160,7 @@ class ResponseSafetyValidator:
     def _check_harmful_instructions(self, response: str) -> Tuple[List[str], float]:
         """
         Check for harmful instructions in response
-        Lý do: Prevent AI from providing dangerous how-to information
+        Reason: Prevent AI from providing dangerous how-to information
         """
         issues = []
         confidence_scores = []
@@ -177,7 +177,7 @@ class ResponseSafetyValidator:
     def _check_content_policy_violations(self, response: str) -> Tuple[List[str], List[str]]:
         """
         Check against content policy rules
-        Lý do: Ensure responses comply với organizational content policies
+        Reason: Ensure responses comply với organizational content policies
         """
         violations = []
         violation_details = []
@@ -204,7 +204,7 @@ class ResponseSafetyValidator:
     def _calculate_safety_score(self, response: str, issues: List[str]) -> float:
         """
         Calculate overall safety score (0-1, higher is safer)
-        Lý do: Quantitative measure of response safety
+        Reason: Quantitative measure of response safety
         """
         base_score = 1.0
         
@@ -233,7 +233,7 @@ class ResponseSafetyValidator:
     def _sanitize_response(self, response: str, issues: List[str]) -> str:
         """
         Attempt to sanitize unsafe response
-        Lý do: Try to preserve helpful content while removing unsafe parts
+        Reason: Try to preserve helpful content while removing unsafe parts
         """
         sanitized = response
         
@@ -264,7 +264,7 @@ class ResponseSafetyValidator:
     def validate_response(self, response: str, original_prompt: str = None) -> ValidationResponse:
         """
         Main validation function
-        Lý do: Comprehensive safety validation của AI responses
+        Reason: Comprehensive safety validation của AI responses
         """
         self.stats['total_validated'] += 1
         
@@ -410,8 +410,8 @@ if __name__ == "__main__":
         
         # Try to load from different datasets
         dataset_files = [
-            'challenging_dataset_20251113_043657.csv',
-            'huggingface_dataset_20251113_050346.csv'
+            'challenging_dataset_*.csv',
+            'huggingface_dataset_*.csv'
         ]
         
         for dataset_file in dataset_files:
@@ -559,20 +559,20 @@ if __name__ == "__main__":
     for i, (prompt, response) in enumerate(zip(random_prompts, test_responses), 1):
         print(f"\nPERFORMANCE Test {i}:")
         print(f"INPUT Original Prompt: {prompt[:60]}...")
-        print(f"🤖 AI Response: {response[:60]}...")
+        print(f"AI Response: {response[:60]}...")
         print("-" * 50)
         
         validation = validator.validate_response(response, prompt)
         
         print(f"ANALYSIS Result: {validation.result.value}")
-        print(f"🛡️ Safety Score: {validation.safety_score:.2f}")
+        print(f"Safety Score: {validation.safety_score:.2f}")
         print(f"TARGET Confidence: {validation.confidence:.2f}")
         
         if validation.issues_found:
             print(f"WARNING Issues: {validation.issues_found}")
         
         if validation.content_policy_violations:
-            print(f"🚨 Policy Violations: {validation.content_policy_violations}")
+            print(f"Policy Violations: {validation.content_policy_violations}")
         
         if validation.safe_response and validation.safe_response != validation.original_response:
             print(f"FIX Sanitized: {validation.safe_response[:80]}...")

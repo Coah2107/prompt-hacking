@@ -1,6 +1,6 @@
 """
 Semantic Content Filter - Deep content analysis
-Lý do: Catch sophisticated attacks that bypass simple pattern matching
+Reason: Catch sophisticated attacks that bypass simple pattern matching
 """
 
 import numpy as np
@@ -71,7 +71,7 @@ class SemanticContentFilter:
     def _load_detection_models(self):
         """
         Load trained models từ detection system
-        Lý do: Reuse detection models để analyze semantic content
+        Reason: Reuse detection models để analyze semantic content
         """
         if self.detection_config and hasattr(self.detection_config, 'MODELS_DIR'):
             models_dir = self.detection_config.MODELS_DIR
@@ -103,7 +103,7 @@ class SemanticContentFilter:
     def _analyze_topic_distribution(self, prompt: str) -> Dict[str, float]:
         """
         Analyze topic distribution trong prompt
-        Lý do: Understand what the prompt is about để assess risk
+        Reason: Understand what the prompt is about để assess risk
         """
         prompt_lower = prompt.lower()
         
@@ -141,7 +141,7 @@ class SemanticContentFilter:
     def _classify_intent(self, prompt: str) -> Tuple[str, float]:
         """
         Classify user intent
-        Lý do: Understanding intent helps determine if content is malicious
+        Reason: Understanding intent helps determine if content is malicious
         """
         intent_patterns = {
             'information_seeking': [
@@ -185,7 +185,7 @@ class SemanticContentFilter:
     def _calculate_toxicity_score(self, prompt: str) -> float:
         """
         Calculate toxicity/harmfulness score
-        Lý do: Quantify how toxic or harmful the content might be
+        Reason: Quantify how toxic or harmful the content might be
         """
         toxic_indicators = [
             'hate', 'kill', 'murder', 'harm', 'hurt', 'destroy', 'attack',
@@ -210,7 +210,7 @@ class SemanticContentFilter:
     def _calculate_attack_similarity(self, prompt: str) -> float:
         """
         Calculate similarity to known attack patterns
-        Lý do: Use ML model để determine if prompt similar to training attack examples
+        Reason: Use ML model để determine if prompt similar to training attack examples
         """
         # Use simple pattern matching approach for now
         # TODO: Integrate properly fitted ML models in production
@@ -247,7 +247,7 @@ class SemanticContentFilter:
     def analyze_semantic_content(self, prompt: str) -> SemanticAnalysis:
         """
         Comprehensive semantic analysis
-        Lý do: Main function to analyze all semantic aspects of content
+        Reason: Main function to analyze all semantic aspects of content
         """
         # Topic analysis
         topic_probabilities = self._analyze_topic_distribution(prompt)
@@ -283,7 +283,7 @@ class SemanticContentFilter:
     def should_block_content(self, analysis: SemanticAnalysis) -> Tuple[bool, List[str]]:
         """
         Decision function based on semantic analysis
-        Lý do: Make blocking decision dựa trên multiple semantic factors
+        Reason: Make blocking decision dựa trên multiple semantic factors
         """
         reasons = []
         should_block = False

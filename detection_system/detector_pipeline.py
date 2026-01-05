@@ -37,7 +37,7 @@ class DetectionPipeline:
     def load_data(self):
         """
         Load training và test data
-        Lý do: Centralized data loading với error handling
+        Reason: Centralized data loading với error handling
         """
         try:
             print("Loading datasets...")

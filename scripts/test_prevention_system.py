@@ -4,7 +4,7 @@ Prevention System Integration Test
 Author: Security Team
 Date: November 2024
 
-Lý do: Test toàn bộ prevention pipeline kết hợp với detection system
+Reason: Test toàn bộ prevention pipeline kết hợp với detection system
 """
 
 import sys

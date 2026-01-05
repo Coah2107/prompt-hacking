@@ -1,6 +1,6 @@
 """
 Configuration file cho Detection System
-Lý do: Centralize tất cả settings, dễ dàng thay đổi parameters mà không cần sửa code
+Reason: Centralize tất cả settings, dễ dàng thay đổi parameters mà không cần sửa code
 """
 
 import os
@@ -14,9 +14,9 @@ class Config:
     RESULTS_DIR = BASE_DIR / "results"
     
     # Dataset files - Updated to use HuggingFace datasets
-    TRAIN_DATA = DATASET_DIR / "huggingface_train_20251113_050346.csv"
-    TEST_DATA = DATASET_DIR / "huggingface_test_20251113_050346.csv"
-    FULL_DATA = DATASET_DIR / "huggingface_dataset_20251113_050346.csv"
+    TRAIN_DATA = DATASET_DIR / "huggingface_train_*.csv"
+    TEST_DATA = DATASET_DIR / "huggingface_test_*.csv"
+    FULL_DATA = DATASET_DIR / "huggingface_dataset_*.csv"
     
     # Model parameters - Optimized for faster training
     RANDOM_STATE = 42  # Để reproducible results
