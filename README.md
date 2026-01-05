@@ -140,7 +140,7 @@ python scripts/dataset_summary.py
 
 | Rank | Model | Type | F1 Score | Accuracy | Precision | Recall |
 |------|-------|------|----------|----------|-----------|--------|
-| 🥇 1 | **DistilBERT** | DL | **0.6491** | 0.7821 | 0.5217 | 0.8588 |
+| 🥇 1 | **DistilBERT** | DL | **0.6764** | 0.8018 | 0.5484 | 0.8825 |
 | 2 | SVM (Fast) | ML | 0.4522 | 0.5456 | 0.3153 | 0.7990 |
 | 3 | Naive Bayes | ML | 0.4289 | 0.6311 | 0.3368 | 0.5902 |
 | 4 | Random Forest | ML | 0.3826 | 0.2574 | 0.2377 | 0.9806 |
