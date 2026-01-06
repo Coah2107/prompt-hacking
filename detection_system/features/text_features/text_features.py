@@ -1,6 +1,6 @@
 """
 Text Features Extractor
-Lý do: Chuyển đổi raw text thành numerical features mà ML models có thể hiểu được
+Reason: Chuyển đổi raw text thành numerical features mà ML models có thể hiểu được
 """
 
 import pandas as pd
@@ -20,7 +20,7 @@ class TextFeaturesExtractor:
     def extract_basic_features(self, texts):
         """
         Trích xuất các đặc trưng cơ bản từ text
-        Lý do: Các đặc trưng này thường khác biệt giữa malicious và benign prompts
+        Reason: Các đặc trưng này thường khác biệt giữa malicious và benign prompts
         """
         features = []
         
@@ -64,7 +64,7 @@ class TextFeaturesExtractor:
     def extract_suspicious_patterns(self, texts):
         """
         Phát hiện các pattern đáng nghi trong text
-        Lý do: Malicious prompts thường chứa các keyword/pattern đặc trưng
+        Reason: Malicious prompts thường chứa các keyword/pattern đặc trưng
         """
         # Các pattern đáng nghi từ nghiên cứu giai đoạn 1
         suspicious_patterns = {
@@ -105,7 +105,7 @@ class TextFeaturesExtractor:
     def extract_tfidf_features(self, texts, fit=True):
         """
         Trích xuất TF-IDF features
-        Lý do: Capture importance của từng từ trong corpus, hiệu quả cho text classification
+        Reason: Capture importance của từng từ trong corpus, hiệu quả cho text classification
         """
         if fit or self.tfidf_vectorizer is None:
             self.tfidf_vectorizer = TfidfVectorizer(
@@ -126,7 +126,7 @@ class TextFeaturesExtractor:
     def extract_all_features(self, texts, fit=True):
         """
         Kết hợp tất cả các loại features
-        Lý do: Combining multiple feature types thường cho kết quả tốt hơn
+        Reason: Combining multiple feature types thường cho kết quả tốt hơn
         """
         print(f"Đang trích xuất features cho {len(texts)} texts...")
         

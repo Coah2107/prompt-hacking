@@ -1,6 +1,6 @@
 """
 Rule-Based Pattern Detector
-Lý do: Provides interpretable baseline và có thể catch obvious attacks
+Reason: Provides interpretable baseline và có thể catch obvious attacks
 """
 
 import re
@@ -16,7 +16,7 @@ class RuleBasedDetector:
     def _initialize_rules(self):
         """
         Khởi tạo các rules detection
-        Lý do: Dựa trên patterns được identify trong research phase
+        Reason: Dựa trên patterns được identify trong research phase
         """
         rules = {
             # High severity rules
@@ -88,7 +88,7 @@ class RuleBasedDetector:
     def detect_single_prompt(self, prompt: str) -> Dict:
         """
         Phát hiện một prompt đơn lẻ
-        Lý do: Modularity - có thể dùng cho real-time detection
+        Reason: Modularity - có thể dùng cho real-time detection
         """
         prompt_lower = prompt.lower()
         detections = []
@@ -127,7 +127,7 @@ class RuleBasedDetector:
     def detect_batch(self, prompts: List[str]) -> List[Dict]:
         """
         Phát hiện batch prompts
-        Lý do: Efficient processing cho evaluation
+        Reason: Efficient processing cho evaluation
         """
         results = []
         

@@ -1,11 +1,3 @@
-"""
-Deep Learning Transformer Model for Prompt Hacking Detection
-Author: AI Security Team
-Date: November 2024
-
-Lý do: Sử dụng deep learning để capture complex patterns mà traditional ML bỏ lỡ
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -125,7 +117,7 @@ class DeepLearningTrainer:
         """
         Prepare data cho training
         """
-        print("📊 Preparing training data...")
+        print("Preparing training data...")
         
         # Convert labels to binary if needed
         if 'label' in train_df.columns:
@@ -164,12 +156,12 @@ class DeepLearningTrainer:
         train_dataset = PromptHackingDataset(X_train, y_train, self.tokenizer, self.max_length)
         val_dataset = PromptHackingDataset(X_val, y_val, self.tokenizer, self.max_length)
         
-        print(f"✅ Training samples: {len(train_dataset)}")
-        print(f"✅ Validation samples: {len(val_dataset)}")
+        print(f"Training samples: {len(train_dataset)}")
+        print(f"Validation samples: {len(val_dataset)}")
         
         # Class distribution
         train_labels = pd.Series(y_train)
-        print(f"📊 Training class distribution:")
+        print(f"   Training class distribution:")
         print(f"   Benign: {sum(train_labels == 0)} ({sum(train_labels == 0)/len(train_labels)*100:.1f}%)")
         print(f"   Malicious: {sum(train_labels == 1)} ({sum(train_labels == 1)/len(train_labels)*100:.1f}%)")
         
@@ -180,8 +172,8 @@ class DeepLearningTrainer:
         """
         Train deep learning model
         """
-        print(f"🚀 Starting deep learning training...")
-        print(f"📋 Config: batch_size={batch_size}, epochs={epochs}, lr={learning_rate}")
+        print(f"Starting deep learning training...")
+        print(f"Config: batch_size={batch_size}, epochs={epochs}, lr={learning_rate}")
         
         # Initialize model
         self.model = TransformerPromptDetector(self.model_name)
@@ -211,7 +203,7 @@ class DeepLearningTrainer:
         training_history = []
         
         for epoch in range(epochs):
-            print(f"\n🔄 Epoch {epoch + 1}/{epochs}")
+            print(f"\nEpoch {epoch + 1}/{epochs}")
             
             # Training phase
             self.model.train()
@@ -252,7 +244,7 @@ class DeepLearningTrainer:
             # Validation phase
             val_f1, val_loss, val_predictions = self.evaluate(val_loader, criterion)
             
-            print(f"📊 Results:")
+            print(f"   Results:")
             print(f"   Train Loss: {avg_train_loss:.4f}, Train F1: {train_f1:.4f}")
             print(f"   Val Loss: {val_loss:.4f}, Val F1: {val_f1:.4f}")
             
@@ -260,7 +252,7 @@ class DeepLearningTrainer:
             if val_f1 > best_f1:
                 best_f1 = val_f1
                 self.best_model_state = self.model.state_dict().copy()
-                print(f"   ✅ New best F1: {best_f1:.4f}")
+                print(f"   New best F1: {best_f1:.4f}")
             
             training_history.append({
                 'epoch': epoch + 1,
@@ -275,7 +267,7 @@ class DeepLearningTrainer:
             self.model.load_state_dict(self.best_model_state)
         
         # Final evaluation
-        print(f"\n🎯 FINAL EVALUATION (Best F1: {best_f1:.4f})")
+        print(f"\nFINAL EVALUATION (Best F1: {best_f1:.4f})")
         final_predictions = self.predict(X_val)
         final_report = classification_report(y_val, final_predictions, 
                                            target_names=['benign', 'malicious'], 
@@ -391,7 +383,7 @@ class DeepLearningTrainer:
         with open(save_path / 'config.json', 'w') as f:
             json.dump(config, f, indent=2)
         
-        print(f"✅ Model saved to {save_path}")
+        print(f"Model saved to {save_path}")
     
     def load_model(self, model_path):
         """
@@ -412,13 +404,13 @@ class DeepLearningTrainer:
         self.tokenizer = DistilBertTokenizer.from_pretrained(model_path / 'tokenizer')
         self.max_length = config['max_length']
         
-        print(f"✅ Model loaded from {model_path}")
+        print(f"Model loaded from {model_path}")
 
 def main():
     """
     Main training function
     """
-    print("🤖 DEEP LEARNING PROMPT HACKING DETECTOR")
+    print("DEEP LEARNING PROMPT HACKING DETECTOR")
     print("=" * 60)
     
     # Paths
@@ -427,7 +419,7 @@ def main():
     models_dir = project_root / "detection_system" / "saved_models" / "deep_learning"
     
     # Load datasets
-    print("📂 Loading datasets...")
+    print("Loading datasets...")
     
     # Try to load HuggingFace dataset first (larger)
     train_df = None
@@ -439,25 +431,25 @@ def main():
         test_file = datasets_dir / train_file.name.replace("_train_", "_test_")
         
         if test_file.exists():
-            print(f"📊 Trying HuggingFace dataset: {train_file.name}")
+            print(f"Trying HuggingFace dataset: {train_file.name}")
             try:
                 train_df = pd.read_csv(train_file, engine='python')
                 test_df = pd.read_csv(test_file, engine='python')
-                print(f"✅ Successfully loaded HuggingFace dataset!")
+                print(f"Successfully loaded HuggingFace dataset!")
             except Exception as e:
-                print(f"❌ Failed to load HuggingFace dataset: {e}")
-                print("🔄 Falling back to challenging dataset...")
+                print(f"Failed to load HuggingFace dataset: {e}")
+                print("Falling back to challenging dataset...")
                 train_df = None
                 test_df = None
         else:
-            print(f"📊 Trying HuggingFace dataset (train only): {train_file.name}")
+            print(f"Trying HuggingFace dataset (train only): {train_file.name}")
             try:
                 train_df = pd.read_csv(train_file, engine='python')
                 test_df = None
-                print(f"✅ Successfully loaded HuggingFace dataset!")
+                print(f"Successfully loaded HuggingFace dataset!")
             except Exception as e:
-                print(f"❌ Failed to load HuggingFace dataset: {e}")
-                print("🔄 Falling back to challenging dataset...")
+                print(f"Failed to load HuggingFace dataset: {e}")
+                print("Falling back to challenging dataset...")
                 train_df = None
                 test_df = None
     
@@ -468,15 +460,15 @@ def main():
             train_file = challenging_files[0]
             test_file = datasets_dir / train_file.name.replace("_train_", "_test_")
             
-            print(f"📊 Using Challenging dataset: {train_file.name}")
+            print(f"Using Challenging dataset: {train_file.name}")
             train_df = pd.read_csv(train_file)
             test_df = pd.read_csv(test_file) if test_file.exists() else None
         else:
             raise FileNotFoundError("No training datasets found!")
     
-    print(f"✅ Loaded {len(train_df)} training samples")
+    print(f"Loaded {len(train_df)} training samples")
     if test_df is not None:
-        print(f"✅ Loaded {len(test_df)} test samples")
+        print(f"Loaded {len(test_df)} test samples")
     
     # Initialize trainer
     trainer = DeepLearningTrainer()
@@ -495,9 +487,9 @@ def main():
     # Save model
     trainer.save_model(models_dir)
     
-    print(f"\n🎯 TRAINING COMPLETED!")
-    print(f"📈 Best F1 Score: {best_f1:.4f}")
-    print(f"💾 Model saved to: {models_dir}")
+    print(f"\nTRAINING COMPLETED!")
+    print(f"Best F1 Score: {best_f1:.4f}")
+    print(f"Model saved to: {models_dir}")
     
     return trainer, best_f1
 

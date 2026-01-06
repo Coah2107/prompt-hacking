@@ -1,6 +1,6 @@
 """
 Detailed Evaluation và Visualization
-Lý do: Deep analysis kết quả để understand strengths/weaknesses của từng approach
+Reason: Deep analysis kết quả để understand strengths/weaknesses của từng approach
 """
 
 import pandas as pd
