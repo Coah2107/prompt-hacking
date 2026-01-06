@@ -33,28 +33,27 @@ B. CHALLENGING DATASET (Development)
 3. CAI DAT
 --------------------------------------------------------------------------------
 
-BUOC 1: Clone repository
+BUOC 1: Clone repository (Neu chua co source)
 -----------------------
    git clone https://github.com/Coah2107/prompt-hacking.git
    cd prompt-hacking
 
-BUOC 2: Download dataset
-------------------------
-   Truy cap link Google Drive sau de tai dataset:
-   https://drive.google.com/drive/folders/1pFnysrL0KakUvi2pCxcKe2Axt2ERCI8J?usp=sharing
+BUOC 2: Khoi dong venv
+-----------------------
 
-   Sau khi tai ve, giai nen va dat cac file vao thu muc datasets/ trong project:
-   
-   prompt-hacking/
-      datasets/
-         huggingface_dataset_test_*.csv      (file test - 74,730 mau)
-         huggingface_dataset_train_*.csv     (file train - 298,916 mau)
-         challenging_dataset_test_*.csv      (file test nang cao)
-         challenging_dataset_train_*.csv     (file train nang cao)
+   A. Tren macOS/Linux:
+   --------------------
+   source venv/bin/activate
 
-   Luu y: Dam bao cac file CSV duoc dat dung vi tri de he thong co the doc duoc.
+   B. Tren Windows (Command Prompt):
+   ---------------------------------
+   venv\Scripts\activate.bat
 
-BUOC 3: Cai dat cac thu vien can thiet
+   C. Tren Windows (PowerShell):
+   -----------------------------
+   .\venv\Scripts\Activate.ps1
+
+BUOC 3: Cai dat cac thu vien can thiet (Neu khong khoi dong duoc venv)
 --------------------------------------
    # Cai dat thu vien co ban
    pip install pandas numpy scikit-learn matplotlib seaborn
